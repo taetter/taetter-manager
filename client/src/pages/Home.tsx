@@ -20,123 +20,145 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+      <div className="min-h-screen flex items-center justify-center bg-slate-900">
+        <div className="animate-spin h-8 w-8 border-4 border-amber-500 border-t-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-blue-950">
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Decorative Lines - Subtle Grid */}
+        {/* Decorative Grid - Subtle */}
         <div className="absolute inset-0 opacity-[0.03]">
           <div className="absolute inset-0" style={{
             backgroundImage: `
-              linear-gradient(to right, #1e3a8a 1px, transparent 1px),
-              linear-gradient(to bottom, #1e3a8a 1px, transparent 1px)
+              linear-gradient(to right, #d4af37 1px, transparent 1px),
+              linear-gradient(to bottom, #d4af37 1px, transparent 1px)
             `,
             backgroundSize: '80px 80px'
           }} />
         </div>
 
-        {/* Decorative Circles - Control Elements */}
-        <div className="absolute top-20 right-20 w-64 h-64 border border-blue-900/10 rounded-full" />
-        <div className="absolute top-32 right-32 w-48 h-48 border border-blue-900/10 rounded-full" />
-        <div className="absolute bottom-20 left-20 w-72 h-72 border border-amber-600/10 rounded-full" />
-        <div className="absolute bottom-32 left-32 w-56 h-56 border border-amber-600/10 rounded-full" />
+        {/* Golden Accents */}
+        <div className="absolute top-20 right-20 w-64 h-64 border border-amber-500/20 rounded-full" />
+        <div className="absolute top-32 right-32 w-48 h-48 border border-amber-500/30 rounded-full" />
+        <div className="absolute bottom-20 left-20 w-72 h-72 border border-blue-400/20 rounded-full" />
+        <div className="absolute bottom-32 left-32 w-56 h-56 border border-blue-400/30 rounded-full" />
 
-        {/* Vertical Lines - Precision Indicators */}
-        <div className="absolute left-1/4 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-blue-900/10 to-transparent" />
-        <div className="absolute right-1/4 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-amber-600/10 to-transparent" />
+        {/* Vertical Golden Lines */}
+        <div className="absolute left-1/4 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-amber-500/20 to-transparent" />
+        <div className="absolute right-1/4 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-amber-500/20 to-transparent" />
 
         {/* Main Content */}
         <div className="relative z-10 container mx-auto px-4 py-20 text-center">
-          {/* Logo */}
-          <div className="mb-12 flex justify-center">
-            <img 
-              src="/logo-full.png" 
-              alt="Taetter - Imunidade Mensurada" 
-              className="w-full max-w-2xl h-auto"
-            />
+          {/* Logo with Elegant Frame */}
+          <div className="mb-16 flex justify-center">
+            <div className="relative inline-block">
+              {/* Elegant Frame */}
+              <div className="absolute -inset-8 border-2 border-amber-500/30 rounded-lg" />
+              <div className="absolute -inset-6 border border-amber-500/20 rounded-lg" />
+              <div className="absolute -inset-4 bg-gradient-to-br from-amber-500/5 to-transparent rounded-lg" />
+              
+              {/* Logo */}
+              <img 
+                src="/logo-full.png" 
+                alt="Taetter - Imunidade Mensurada" 
+                className="relative w-full max-w-lg h-auto"
+              />
+            </div>
           </div>
 
-          {/* Tagline */}
-          <p className="text-2xl md:text-3xl text-slate-600 font-light tracking-wide mb-16 max-w-3xl mx-auto leading-relaxed">
-            Sistema integrado de gestão de vacinação
-            <span className="block mt-2 text-lg text-slate-500">
-              Da compra ao registro, com precisão e controle total
-            </span>
+          {/* New Title */}
+          <h1 className="text-4xl md:text-5xl font-light text-white tracking-wide mb-8">
+            Vaccine Interface System
+          </h1>
+
+          {/* New Tagline - Philosophical */}
+          <p className="text-xl md:text-2xl text-slate-300 font-light leading-relaxed max-w-4xl mx-auto mb-6">
+            Se o sistema imunológico não funciona por eventos isolados,
+            <br />
+            mas por <span className="text-amber-400">interações contínuas</span>, <span className="text-amber-400">mediadas</span> e <span className="text-amber-400">mensuráveis</span>,
+            <br />
+            a sua empresa também deve ser assim
           </p>
 
-          {/* Stats Grid - Visual Representation of Control */}
+          {/* Highlighted Statement */}
+          <div className="relative inline-block mt-12 mb-20">
+            <div className="absolute -inset-4 bg-gradient-to-r from-amber-500/20 via-amber-500/30 to-amber-500/20 blur-xl" />
+            <p className="relative text-3xl md:text-4xl font-light text-amber-400 tracking-wide px-8 py-4">
+              Nós somos a <span className="font-normal text-amber-300">interface</span>
+            </p>
+          </div>
+
+          {/* Stats Grid - Enhanced with Dark Theme */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto mt-20">
             <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-900/5 to-transparent rounded-lg transform group-hover:scale-105 transition-transform duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent rounded-lg transform group-hover:scale-105 transition-transform duration-300 border border-blue-500/20" />
               <div className="relative p-6">
                 <div className="w-16 h-16 mx-auto mb-4 relative">
-                  <div className="absolute inset-0 border-2 border-blue-900/20 rounded-full" />
-                  <div className="absolute inset-2 border-2 border-blue-900/40 rounded-full" />
-                  <div className="absolute inset-4 bg-blue-900/60 rounded-full" />
+                  <div className="absolute inset-0 border-2 border-blue-400/40 rounded-full" />
+                  <div className="absolute inset-2 border-2 border-blue-400/60 rounded-full" />
+                  <div className="absolute inset-4 bg-blue-400/80 rounded-full" />
                 </div>
-                <div className="text-sm font-light text-slate-600 tracking-wide">Multi-Tenant</div>
+                <div className="text-sm font-light text-slate-300 tracking-wide">Multi-Tenant</div>
               </div>
             </div>
 
             <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-600/5 to-transparent rounded-lg transform group-hover:scale-105 transition-transform duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent rounded-lg transform group-hover:scale-105 transition-transform duration-300 border border-amber-500/20" />
               <div className="relative p-6">
                 <div className="w-16 h-16 mx-auto mb-4 relative">
-                  <svg className="w-full h-full text-amber-600/60" viewBox="0 0 64 64" fill="none">
+                  <svg className="w-full h-full text-amber-400/80" viewBox="0 0 64 64" fill="none">
                     <path d="M8 32 L32 8 L56 32 L32 56 Z" stroke="currentColor" strokeWidth="2" fill="none"/>
                     <path d="M20 32 L32 20 L44 32 L32 44 Z" stroke="currentColor" strokeWidth="2" fill="none"/>
                   </svg>
                 </div>
-                <div className="text-sm font-light text-slate-600 tracking-wide">Integração RNDS</div>
+                <div className="text-sm font-light text-slate-300 tracking-wide">Integração RNDS</div>
               </div>
             </div>
 
             <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-900/5 to-transparent rounded-lg transform group-hover:scale-105 transition-transform duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent rounded-lg transform group-hover:scale-105 transition-transform duration-300 border border-blue-500/20" />
               <div className="relative p-6">
                 <div className="w-16 h-16 mx-auto mb-4 relative">
-                  <div className="absolute inset-0 border-l-2 border-t-2 border-blue-900/40" />
-                  <div className="absolute inset-0 border-r-2 border-b-2 border-amber-600/40" />
-                  <div className="absolute inset-4 bg-gradient-to-br from-blue-900/20 to-amber-600/20" />
+                  <div className="absolute inset-0 border-l-2 border-t-2 border-blue-400/60" />
+                  <div className="absolute inset-0 border-r-2 border-b-2 border-amber-400/60" />
+                  <div className="absolute inset-4 bg-gradient-to-br from-blue-400/30 to-amber-400/30" />
                 </div>
-                <div className="text-sm font-light text-slate-600 tracking-wide">Rastreabilidade</div>
+                <div className="text-sm font-light text-slate-300 tracking-wide">Rastreabilidade</div>
               </div>
             </div>
 
             <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-600/5 to-transparent rounded-lg transform group-hover:scale-105 transition-transform duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent rounded-lg transform group-hover:scale-105 transition-transform duration-300 border border-amber-500/20" />
               <div className="relative p-6">
                 <div className="w-16 h-16 mx-auto mb-4 relative">
                   <div className="grid grid-cols-3 gap-1 w-full h-full">
                     {[...Array(9)].map((_, i) => (
-                      <div key={i} className="bg-amber-600/40 rounded-sm" />
+                      <div key={i} className="bg-amber-400/60 rounded-sm" />
                     ))}
                   </div>
                 </div>
-                <div className="text-sm font-light text-slate-600 tracking-wide">NFe Automática</div>
+                <div className="text-sm font-light text-slate-300 tracking-wide">NFe Automática</div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Scroll Indicator */}
+        {/* Scroll Indicator - Golden */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-slate-300 rounded-full flex items-start justify-center p-2">
-            <div className="w-1 h-3 bg-slate-400 rounded-full" />
+          <div className="w-6 h-10 border-2 border-amber-500/50 rounded-full flex items-start justify-center p-2">
+            <div className="w-1 h-3 bg-amber-400/80 rounded-full" />
           </div>
         </div>
       </section>
 
-      {/* Features Section - Minimal & Elegant */}
-      <section className="relative py-32 bg-gradient-to-b from-white to-slate-50">
-        {/* Section Divider Line */}
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-px h-16 bg-gradient-to-b from-transparent to-slate-300" />
+      {/* Features Section - Dark Theme */}
+      <section className="relative py-32 bg-gradient-to-b from-slate-800 to-slate-900">
+        {/* Section Divider Line - Golden */}
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-px h-16 bg-gradient-to-b from-transparent to-amber-500/50" />
         
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
@@ -144,28 +166,28 @@ export default function Home() {
             <div className="grid md:grid-cols-2 gap-16 items-center mb-32">
               <div className="order-2 md:order-1">
                 <div className="relative">
-                  {/* Decorative Element */}
-                  <div className="absolute -left-8 top-0 w-1 h-24 bg-gradient-to-b from-blue-900 to-transparent" />
-                  <h3 className="text-3xl font-light text-slate-800 mb-6 tracking-tight">
+                  {/* Golden Accent */}
+                  <div className="absolute -left-8 top-0 w-1 h-24 bg-gradient-to-b from-amber-500 to-transparent" />
+                  <h3 className="text-3xl font-light text-white mb-6 tracking-tight">
                     Gestão Centralizada
                   </h3>
-                  <p className="text-lg text-slate-600 font-light leading-relaxed">
+                  <p className="text-lg text-slate-300 font-light leading-relaxed">
                     Controle múltiplas clínicas em uma única plataforma. Isolamento completo de dados, 
                     permissões granulares e visibilidade total das operações.
                   </p>
                 </div>
               </div>
               <div className="order-1 md:order-2">
-                {/* Visual Representation - Hierarchy */}
+                {/* Visual Representation - Hierarchy with Golden Accent */}
                 <div className="relative h-64 flex items-center justify-center">
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-32 h-32 border-2 border-blue-900/20 rounded-lg" />
+                    <div className="w-32 h-32 border-2 border-blue-400/30 rounded-lg" />
                   </div>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-24 h-24 border-2 border-blue-900/40 rounded-lg rotate-45" />
+                    <div className="w-24 h-24 border-2 border-amber-500/50 rounded-lg rotate-45" />
                   </div>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-16 h-16 bg-blue-900/60 rounded-lg" />
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-400/60 to-amber-500/60 rounded-lg" />
                   </div>
                 </div>
               </div>
@@ -174,13 +196,14 @@ export default function Home() {
             {/* Feature 2 - Right Aligned */}
             <div className="grid md:grid-cols-2 gap-16 items-center mb-32">
               <div>
-                {/* Visual Representation - Flow */}
+                {/* Visual Representation - Flow with Golden Gradient */}
                 <div className="relative h-64">
                   <svg className="w-full h-full" viewBox="0 0 400 200">
                     <defs>
                       <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#1e3a8a" stopOpacity="0.6" />
-                        <stop offset="100%" stopColor="#d4af37" stopOpacity="0.6" />
+                        <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.8" />
+                        <stop offset="50%" stopColor="#d4af37" stopOpacity="0.8" />
+                        <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.8" />
                       </linearGradient>
                     </defs>
                     <circle cx="50" cy="100" r="20" fill="none" stroke="url(#flowGradient)" strokeWidth="2" />
@@ -195,11 +218,11 @@ export default function Home() {
               </div>
               <div>
                 <div className="relative">
-                  <div className="absolute -right-8 top-0 w-1 h-24 bg-gradient-to-b from-amber-600 to-transparent" />
-                  <h3 className="text-3xl font-light text-slate-800 mb-6 tracking-tight">
+                  <div className="absolute -right-8 top-0 w-1 h-24 bg-gradient-to-b from-amber-500 to-transparent" />
+                  <h3 className="text-3xl font-light text-white mb-6 tracking-tight">
                     Fluxo Integrado
                   </h3>
-                  <p className="text-lg text-slate-600 font-light leading-relaxed">
+                  <p className="text-lg text-slate-300 font-light leading-relaxed">
                     Do estoque à aplicação, cada etapa conectada. Registro automático no RNDS, 
                     emissão de NFe e rastreabilidade completa do lote à dose.
                   </p>
@@ -211,33 +234,33 @@ export default function Home() {
             <div className="grid md:grid-cols-2 gap-16 items-center">
               <div className="order-2 md:order-1">
                 <div className="relative">
-                  <div className="absolute -left-8 top-0 w-1 h-24 bg-gradient-to-b from-blue-900 to-transparent" />
-                  <h3 className="text-3xl font-light text-slate-800 mb-6 tracking-tight">
+                  <div className="absolute -left-8 top-0 w-1 h-24 bg-gradient-to-b from-amber-500 to-transparent" />
+                  <h3 className="text-3xl font-light text-white mb-6 tracking-tight">
                     Experiência do Paciente
                   </h3>
-                  <p className="text-lg text-slate-600 font-light leading-relaxed">
+                  <p className="text-lg text-slate-300 font-light leading-relaxed">
                     Carteirinha virtual, histórico completo de vacinação e notificações inteligentes. 
                     Transparência e controle na palma da mão.
                   </p>
                 </div>
               </div>
               <div className="order-1 md:order-2">
-                {/* Visual Representation - User-Centric */}
+                {/* Visual Representation - User-Centric with Golden Rays */}
                 <div className="relative h-64 flex items-center justify-center">
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-40 h-40 border border-amber-600/20 rounded-full" />
+                    <div className="w-40 h-40 border border-amber-500/30 rounded-full" />
                   </div>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-28 h-28 border border-amber-600/40 rounded-full" />
+                    <div className="w-28 h-28 border border-amber-500/50 rounded-full" />
                   </div>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-16 h-16 bg-amber-600/60 rounded-full" />
+                    <div className="w-16 h-16 bg-gradient-to-br from-amber-400/80 to-blue-400/80 rounded-full" />
                   </div>
-                  {/* Radiating Lines */}
+                  {/* Radiating Lines - Golden */}
                   {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
                     <div
                       key={angle}
-                      className="absolute w-px h-20 bg-gradient-to-t from-amber-600/40 to-transparent"
+                      className="absolute w-px h-20 bg-gradient-to-t from-amber-500/60 to-transparent"
                       style={{
                         transform: `rotate(${angle}deg)`,
                         transformOrigin: 'bottom center',
@@ -252,16 +275,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="relative py-12 bg-gradient-to-b from-slate-50 to-white border-t border-slate-200">
+      {/* Footer - Dark with Golden Accent */}
+      <footer className="relative py-12 bg-slate-950 border-t border-amber-500/20">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center justify-center space-y-4">
-            <p className="text-sm text-slate-500 font-light tracking-wide">
+            <p className="text-sm text-slate-400 font-light tracking-wide">
               Copyright 2026 Taetter. Todos os direitos reservados.
             </p>
             <a 
               href="/login"
-              className="text-xs text-slate-400 hover:text-blue-900 transition-colors duration-300 font-light tracking-widest"
+              className="text-xs text-slate-500 hover:text-amber-400 transition-colors duration-300 font-light tracking-widest"
             >
               v1.0.0
             </a>
