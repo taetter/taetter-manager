@@ -7,18 +7,14 @@ export default function Home() {
   const [, setLocation] = useLocation();
 
   useEffect(() => {
-    if (!loading) {
-      if (user) {
-        // Usuário autenticado - redirecionar para dashboard apropriado
-        if (user.role === "super_admin") {
-          setLocation("/admin/dashboard");
-        } else if (user.role === "admin") {
-          setLocation("/tenant/1/dashboard");
-        }
-      } else {
-        // Usuário não autenticado - redirecionar para login do Master Dashboard
-        setLocation("/login");
+    if (!loading && user) {
+      // Usuário autenticado - redirecionar para dashboard apropriado
+      if (user.role === "super_admin") {
+        setLocation("/admin/dashboard");
+      } else if (user.role === "admin") {
+        setLocation("/tenant/1/dashboard");
       }
+      // Usuários não autenticados veem a landing page (sem redirect)
     }
   }, [user, loading, setLocation]);
 
