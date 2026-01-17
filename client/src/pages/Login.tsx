@@ -33,21 +33,21 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
       {/* Decorative Elements */}
       <div className="absolute inset-0 opacity-[0.02]">
         <div className="absolute inset-0" style={{
           backgroundImage: `
-            linear-gradient(to right, #1e3a8a 1px, transparent 1px),
-            linear-gradient(to bottom, #1e3a8a 1px, transparent 1px)
+            linear-gradient(to right, #d4af37 1px, transparent 1px),
+            linear-gradient(to bottom, #d4af37 1px, transparent 1px)
           `,
-          backgroundSize: '80px 80px'
+          backgroundSize: '100px 100px'
         }} />
       </div>
 
       {/* Login Card */}
       <div className="relative w-full max-w-md">
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-200/50 p-8 md:p-12">
+        <div className="bg-slate-900/90 backdrop-blur-sm rounded-2xl shadow-xl border border-[#d4af37]/20 p-8 md:p-12">
           {/* Logo */}
           <div className="mb-8 flex justify-center">
             <img 
@@ -60,7 +60,7 @@ export default function Login() {
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="username" className="text-slate-700 font-light">
+              <Label htmlFor="username" className="text-slate-300 font-light">
                 Usuário
               </Label>
               <Input
@@ -70,12 +70,12 @@ export default function Login() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
-                className="h-12 bg-white/50 border-slate-300 focus:border-blue-900 focus:ring-blue-900/20"
+                className="h-12 bg-slate-800 border-slate-700 text-slate-100 placeholder:text-slate-500 focus:border-[#d4af37]/50 focus:ring-[#d4af37]/20"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-slate-700 font-light">
+              <Label htmlFor="password" className="text-slate-300 font-light">
                 Senha
               </Label>
               <Input
@@ -85,14 +85,14 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="h-12 bg-white/50 border-slate-300 focus:border-blue-900 focus:ring-blue-900/20"
+                className="h-12 bg-slate-800 border-slate-700 text-slate-100 placeholder:text-slate-500 focus:border-[#d4af37]/50 focus:ring-[#d4af37]/20"
               />
             </div>
 
             <Button
               type="submit"
               disabled={loginMutation.isPending}
-              className="w-full h-12 bg-blue-900 hover:bg-blue-800 text-white font-light tracking-wide transition-all duration-300"
+              className="w-full h-12 bg-[#d4af37] hover:bg-[#c4a030] text-slate-950 font-normal tracking-wide transition-all duration-300"
             >
               {loginMutation.isPending ? (
                 <div className="flex items-center justify-center gap-2">
@@ -106,30 +106,30 @@ export default function Login() {
           </form>
 
           {/* Footer Links */}
-          <div className="mt-8 pt-6 border-t border-slate-200">
+          <div className="mt-8 pt-6 border-t border-slate-800">
             <div className="flex flex-col items-center gap-3 text-sm">
               <div className="flex items-center gap-4">
                 <a 
                   href="https://www.taetter.com.br" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-slate-600 hover:text-blue-900 transition-colors font-light"
+                  className="text-slate-400 hover:text-[#d4af37] transition-colors font-light"
                 >
                   www.taetter.com.br
                 </a>
-                <span className="text-slate-300">•</span>
+                <span className="text-slate-700">•</span>
                 <a 
                   href="https://www.linkedin.com/company/taetter" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-slate-600 hover:text-blue-900 transition-colors font-light"
+                  className="text-slate-400 hover:text-[#d4af37] transition-colors font-light"
                 >
                   LinkedIn
                 </a>
               </div>
               <a 
                 href="mailto:suporte@taetter.com.br"
-                className="text-slate-600 hover:text-blue-900 transition-colors font-light"
+                className="text-slate-400 hover:text-[#d4af37] transition-colors font-light"
               >
                 Suporte
               </a>
@@ -138,8 +138,8 @@ export default function Login() {
         </div>
 
         {/* Decorative Circles */}
-        <div className="absolute -top-20 -right-20 w-40 h-40 border border-blue-900/10 rounded-full -z-10" />
-        <div className="absolute -bottom-20 -left-20 w-40 h-40 border border-amber-600/10 rounded-full -z-10" />
+        <div className="absolute -top-20 -right-20 w-40 h-40 border border-[#d4af37]/10 rounded-full -z-10" />
+        <div className="absolute -bottom-20 -left-20 w-40 h-40 border border-[#d4af37]/10 rounded-full -z-10" />
       </div>
     </div>
   );
