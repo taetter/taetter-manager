@@ -1,125 +1,136 @@
 import { TRPCError } from "@trpc/server";
-import bcrypt from "bcrypt";
-import { SignJWT, jwtVerify } from "jose";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { users } from "../../drizzle/schema";
 import { getDb } from "../db";
 import { publicProcedure, router } from "../_core/trpc";
-import { COOKIE_NAME } from "../../shared/const";
-import { getSessionCookieOptions } from "../_core/cookies";
-
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "default-secret-change-me");
+import { supabase, supabaseAdmin } from "../_core/supabase";
 
 /**
- * Generate JWT token for authenticated user
- */
-async function generateToken(userId: number, username: string, role: string): Promise<string> {
-  const token = await new SignJWT({ userId, username, role })
-    .setProtectedHeader({ alg: "HS256" })
-    .setIssuedAt()
-    .setExpirationTime("7d")
-    .sign(JWT_SECRET);
-  
-  return token;
-}
-
-/**
- * Verify JWT token
- */
-export async function verifyToken(token: string) {
-  try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
-    return payload as { userId: number; username: string; role: string };
-  } catch (error) {
-    return null;
-  }
-}
-
-/**
- * Custom authentication router
+ * Custom authentication router using Supabase Auth
+ * 
+ * IMPORTANT:
+ * - Passwords are managed by Supabase Auth, NOT stored in the users table
+ * - Use supabase.auth.signInWithPassword for login (client-side)
+ * - Use supabaseAdmin.auth.admin.createUser for creating users (server-side only)
+ * - NEVER store or update passwordHash in the users table
  */
 export const customAuthRouter = router({
   /**
-   * Login with username and password
+   * Login with email and password using Supabase Auth
    */
   login: publicProcedure
     .input(
       z.object({
-        username: z.string().min(3),
+        email: z.string().email(),
         password: z.string().min(6),
       })
     )
-    .mutation(async ({ input, ctx }) => {
-      const db = await getDb();
-      if (!db) {
+    .mutation(async ({ input }) => {
+      try {
+        // Sign in with Supabase Auth
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: input.email,
+          password: input.password,
+        });
+
+        if (error) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Email ou senha inválidos",
+          });
+        }
+
+        if (!data.user) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Usuário não encontrado",
+          });
+        }
+
+        // Get user from database
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Database not available",
+          });
+        }
+
+        const [user] = await db
+          .select()
+          .from(users)
+          .where(eq(users.email, input.email))
+          .limit(1);
+
+        if (!user) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Usuário não encontrado no sistema",
+          });
+        }
+
+        return {
+          success: true,
+          user: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            tenantId: user.tenantId,
+          },
+          session: {
+            access_token: data.session.access_token,
+            refresh_token: data.session.refresh_token,
+          },
+        };
+      } catch (error) {
+        if (error instanceof TRPCError) {
+          throw error;
+        }
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Database not available",
+          message: "Erro ao fazer login",
         });
       }
-
-      // Find user by username
-      const [user] = await db
-        .select()
-        .from(users)
-        .where(eq(users.username, input.username))
-        .limit(1);
-
-      if (!user || !user.passwordHash) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "Usuário ou senha inválidos",
-        });
-      }
-
-      // Verify password
-      const isValidPassword = await bcrypt.compare(input.password, user.passwordHash);
-      if (!isValidPassword) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "Usuário ou senha inválidos",
-        });
-      }
-
-      // Generate JWT token
-      const token = await generateToken(user.id, user.username!, user.role);
-
-      // Set cookie
-      const cookieOptions = getSessionCookieOptions(ctx.req);
-      ctx.res.cookie(COOKIE_NAME, token, {
-        ...cookieOptions,
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      });
-
-      return {
-        success: true,
-        user: {
-          id: user.id,
-          username: user.username,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          tenantId: user.tenantId,
-        },
-      };
     }),
 
   /**
-   * Logout
+   * Logout using Supabase Auth
    */
-  logout: publicProcedure.mutation(({ ctx }) => {
-    const cookieOptions = getSessionCookieOptions(ctx.req);
-    ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
-    return {
-      success: true,
-    } as const;
+  logout: publicProcedure.mutation(async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error("[Auth] Logout error:", error);
+      }
+
+      return {
+        success: true,
+      } as const;
+    } catch (error) {
+      console.error("[Auth] Logout error:", error);
+      return {
+        success: true, // Return success anyway to clear client state
+      } as const;
+    }
   }),
 
   /**
-   * Create super admin (temporary endpoint - remove after use)
+   * Create super admin user (idempotent)
+   * Uses Supabase Admin API to create user in auth.users
+   * 
+   * IMPORTANT: This endpoint should be protected or removed after initial setup
    */
   createSuperAdmin: publicProcedure.mutation(async () => {
+    if (!supabaseAdmin) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Supabase Admin client not available - missing SUPABASE_SERVICE_ROLE_KEY",
+      });
+    }
+
     const db = await getDb();
     if (!db) {
       throw new TRPCError({
@@ -128,50 +139,109 @@ export const customAuthRouter = router({
       });
     }
 
-    const username = 'gfranceschi';
+    const email = 'master@taetter.com.br';
     const password = 'gabriel';
     const name = 'Gabriel Franceschi';
-    const email = 'gabriel@taetter.com.br';
 
-    // Check if user exists
-    const [existingUser] = await db
-      .select()
-      .from(users)
-      .where(eq(users.username, username))
-      .limit(1);
-
-    if (existingUser) {
-      // Update password
-      const passwordHash = await bcrypt.hash(password, 10);
-      await db
-        .update(users)
-        .set({ passwordHash, role: 'super_admin' })
-        .where(eq(users.username, username));
+    try {
+      // Check if user exists in Supabase Auth
+      const { data: existingAuthUsers, error: listError } = await supabaseAdmin.auth.admin.listUsers();
       
+      if (listError) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Failed to list users: ${listError.message}`,
+        });
+      }
+
+      const existingAuthUser = existingAuthUsers.users.find(u => u.email === email);
+
+      let authUserId: string;
+
+      if (existingAuthUser) {
+        authUserId = existingAuthUser.id;
+        console.log(`[Auth] User ${email} already exists in Supabase Auth (${authUserId})`);
+      } else {
+        // Create user in Supabase Auth
+        const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true, // Auto-confirm email
+          user_metadata: {
+            name,
+          },
+        });
+
+        if (createError) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: `Failed to create user in Supabase Auth: ${createError.message}`,
+          });
+        }
+
+        if (!newUser.user) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create user - no user returned",
+          });
+        }
+
+        authUserId = newUser.user.id;
+        console.log(`[Auth] Created user ${email} in Supabase Auth (${authUserId})`);
+      }
+
+      // Check if user exists in our database
+      const [existingUser] = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, email))
+        .limit(1);
+
+      if (existingUser) {
+        // Update existing user
+        await db
+          .update(users)
+          .set({
+            openId: authUserId,
+            name,
+            role: 'super_admin',
+            loginMethod: 'supabase',
+          })
+          .where(eq(users.email, email));
+
+        return {
+          success: true,
+          message: `Super admin '${email}' updated successfully`,
+          userId: existingUser.id,
+          authUserId,
+        };
+      }
+
+      // Insert new user in database
+      const [result] = await db.insert(users).values({
+        openId: authUserId,
+        email,
+        name,
+        role: 'super_admin',
+        loginMethod: 'supabase',
+      });
+
       return {
         success: true,
-        message: `User '${username}' updated`,
-        userId: existingUser.id,
+        message: `Super admin '${email}' created successfully`,
+        userId: result.insertId,
+        authUserId,
       };
+    } catch (error) {
+      if (error instanceof TRPCError) {
+        throw error;
+      }
+      
+      console.error("[Auth] createSuperAdmin error:", error);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error creating super admin",
+      });
     }
-
-    // Create password hash
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    // Insert user
-    const [result] = await db.insert(users).values({
-      username,
-      passwordHash,
-      name,
-      email,
-      role: 'super_admin',
-      loginMethod: 'custom',
-    });
-
-    return {
-      success: true,
-      message: `Super admin '${username}' created successfully`,
-      userId: result.insertId,
-    };
   }),
 });
