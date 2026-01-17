@@ -115,4 +115,63 @@ export const customAuthRouter = router({
       success: true,
     } as const;
   }),
+
+  /**
+   * Create super admin (temporary endpoint - remove after use)
+   */
+  createSuperAdmin: publicProcedure.mutation(async () => {
+    const db = await getDb();
+    if (!db) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Database not available",
+      });
+    }
+
+    const username = 'gfranceschi';
+    const password = 'gabriel';
+    const name = 'Gabriel Franceschi';
+    const email = 'gabriel@taetter.com.br';
+
+    // Check if user exists
+    const [existingUser] = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, username))
+      .limit(1);
+
+    if (existingUser) {
+      // Update password
+      const passwordHash = await bcrypt.hash(password, 10);
+      await db
+        .update(users)
+        .set({ passwordHash, role: 'super_admin' })
+        .where(eq(users.username, username));
+      
+      return {
+        success: true,
+        message: `User '${username}' updated`,
+        userId: existingUser.id,
+      };
+    }
+
+    // Create password hash
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Insert user
+    const [result] = await db.insert(users).values({
+      username,
+      passwordHash,
+      name,
+      email,
+      role: 'super_admin',
+      loginMethod: 'custom',
+    });
+
+    return {
+      success: true,
+      message: `Super admin '${username}' created successfully`,
+      userId: result.insertId,
+    };
+  }),
 });

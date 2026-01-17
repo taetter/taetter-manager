@@ -57,6 +57,7 @@ import EmployeeDashboard from "./pages/employee/EmployeeDashboard";
 import IntegrationsDashboard from "./pages/integrations/IntegrationsDashboard";
 import Payslips from "./pages/employee/Payslips";
 import TenantLogin from "./pages/tenant/TenantLogin";
+import CreateSuperAdmin from "./pages/CreateSuperAdmin";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -64,6 +65,7 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/login"} component={Login} />
+      <Route path={"/create-super-admin"} component={CreateSuperAdmin} />
       <Route path={"/admin/dashboard"} component={AdminDashboard} />
       <Route path={"/admin/tenants"} component={TenantsPage} />
       <Route path={"/admin/tenants/new"} component={TenantForm} />
