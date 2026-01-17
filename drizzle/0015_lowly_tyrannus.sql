@@ -1,0 +1,1 @@
+ALTER TABLE `hrEmployees` ADD `senha` varchar(255);

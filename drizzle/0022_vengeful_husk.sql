@@ -1,0 +1,1 @@
+ALTER TABLE `budgets` MODIFY COLUMN `status` enum('pendente','aprovado','recusado','convertido','expirado','cancelado') NOT NULL DEFAULT 'pendente';

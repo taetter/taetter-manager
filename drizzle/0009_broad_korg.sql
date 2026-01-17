@@ -1,0 +1,1 @@
+ALTER TABLE `vaccines` ADD `bula` text;
