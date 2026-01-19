@@ -1,5 +1,5 @@
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
-import { appRouter } from "../../server/routers";
+import { appRouter } from "../../server/routers.js";
 import { createContext } from "../../server/_core/context";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import express from "express";
