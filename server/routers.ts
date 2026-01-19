@@ -4,7 +4,6 @@ import { systemRouter } from "./_core/systemRouter.js";
 import { publicProcedure, router } from "./_core/trpc.js";
 import { tenantsRouter } from "./routers/tenants.js";
 import { patientsRouter } from "./routers/patients.js";
-import { customAuthRouter } from "./routers/customAuth.js";
 import { uploadRouter } from "./routers/upload.js";
 import { patientAuthRouter } from "./routers/patientAuth.js";
 import { unitsRouter } from "./routers/units.js";
@@ -27,7 +26,6 @@ import { patientGuardiansRouter } from "./routers/patientGuardians.js";
 import { bankAccountsRouter } from "./routers/bankAccounts.js";
 import { appointmentsRouter } from "./routers/appointments.js";
 import { tenantIntegrationsRouter } from "./routers/tenantIntegrations.js";
-import { healthRouter } from "./routers/health.js";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -43,12 +41,6 @@ export const appRouter = router({
     }),
   }),
 
-  // Health check
-  health: healthRouter,
-  
-  // Custom authentication
-  customAuth: customAuthRouter,
-  
   // Feature routers
   tenants: tenantsRouter,
   tenantIntegrations: tenantIntegrationsRouter,
