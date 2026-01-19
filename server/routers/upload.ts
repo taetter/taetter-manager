@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { router, protectedProcedure } from "../_core/trpc";
-import { storagePut } from "../storage";
+import { router, protectedProcedure } from "../_core/trpc.js";
+import { storagePut } from "../storage.js";
 import { TRPCError } from "@trpc/server";
 import { nanoid } from "nanoid";
 

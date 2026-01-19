@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { router } from "../_core/trpc";
-import { tenantProcedure } from "../tenantMiddleware";
-import { getDb } from "../db";
+import { router } from "../_core/trpc.js";
+import { tenantProcedure } from "../tenantMiddleware.js";
+import { getDb } from "../db.js";
 import { 
   pops, 
   regulatoryDocuments, 

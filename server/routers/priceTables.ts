@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { eq, and, desc } from "drizzle-orm";
-import { protectedProcedure, router } from "../_core/trpc";
+import { protectedProcedure, router } from "../_core/trpc.js";
 import { priceTables } from "../../drizzle/schema";
-import { getDb } from "../db";
+import { getDb } from "../db.js";
 
 export const priceTablesRouter = router({
   // Listar tabelas de preços

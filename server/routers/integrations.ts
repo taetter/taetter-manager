@@ -1,7 +1,7 @@
-import { router } from "../_core/trpc";
-import { tenantProcedure } from "../tenantMiddleware";
+import { router } from "../_core/trpc.js";
+import { tenantProcedure } from "../tenantMiddleware.js";
 import { z } from "zod";
-import { getDb } from "../db";
+import { getDb } from "../db.js";
 import { 
   healthEstablishments, 
   rndsCredentials, 

@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { eq, and, gte, lte, desc, sql } from "drizzle-orm";
-import { publicProcedure, protectedProcedure, router } from "../_core/trpc";
-import { getDb } from "../db";
+import { publicProcedure, protectedProcedure, router } from "../_core/trpc.js";
+import { getDb } from "../db.js";
 import * as schema from "../../drizzle/schema";
 
 export const appointmentsRouter = router({

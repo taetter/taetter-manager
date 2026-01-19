@@ -1,8 +1,8 @@
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import type { User } from "../../drizzle/schema";
-import { sdk } from "./sdk";
-import { verifyToken } from "../routers/customAuth";
-import { getDb } from "../db";
+import { sdk } from "./sdk.js";
+import { verifyToken } from "../routers/customAuth.js";
+import { getDb } from "../db.js";
 import { eq } from "drizzle-orm";
 import { users } from "../../drizzle/schema";
 import { COOKIE_NAME } from "../../shared/const";

@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
-import { publicProcedure, router } from "../_core/trpc";
-import { getDb } from "../db";
-import { supabase, supabaseAdmin, supabaseConfig } from "../_core/supabase";
+import { publicProcedure, router } from "../_core/trpc.js";
+import { getDb } from "../db.js";
+import { supabase, supabaseAdmin, supabaseConfig } from "../_core/supabase.js";
 
 /**
  * Health check router

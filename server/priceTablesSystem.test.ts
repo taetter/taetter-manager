@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import { appRouter } from "./routers";
-import { getDb } from "./db";
-import { tenants, priceTables, vaccinePrices, vaccines } from "../drizzle/schema";
+import { appRouter } from "./routers.js";
+import { getDb } from "./db.js";
+import { tenants, priceTables, vaccinePrices, vaccines } from "../drizzle/schema.js";
 import { eq } from "drizzle-orm";
 
 describe("Price Tables System", () => {

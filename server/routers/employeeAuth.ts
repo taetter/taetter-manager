@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { publicProcedure, router } from "../_core/trpc";
+import { publicProcedure, router } from "../_core/trpc.js";
 import { TRPCError } from "@trpc/server";
-import { getDb } from "../db";
+import { getDb } from "../db.js";
 import { hrEmployees } from "../../drizzle/schema";
 import { eq, and, sql } from "drizzle-orm";
 import * as bcrypt from "bcryptjs";

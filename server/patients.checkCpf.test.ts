@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { appRouter } from "./routers";
-import { getDb } from "./db";
-import { patients } from "../drizzle/schema";
+import { appRouter } from "./routers.js";
+import { getDb } from "./db.js";
+import { patients } from "../drizzle/schema.js";
 import { eq, and, isNull } from "drizzle-orm";
 
 describe("Patients checkCpf Router", () => {

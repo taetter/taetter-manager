@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { router, protectedProcedure } from "../_core/trpc";
-import { getDb } from "../db";
+import { router, protectedProcedure } from "../_core/trpc.js";
+import { getDb } from "../db.js";
 import { vaccineApplications, vaccines, patients, payments, patientVaccinationHistory, units, refrigerators } from "../../drizzle/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";

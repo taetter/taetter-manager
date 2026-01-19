@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { initTRPC } from "@trpc/server";
-import { publicProcedure } from "./_core/trpc";
-import type { TrpcContext } from "./_core/context";
+import { publicProcedure } from "./_core/trpc.js";
+import type { TrpcContext } from "./_core/context.js";
 import superjson from "superjson";
 
 const t = initTRPC.context<TrpcContext>().create({

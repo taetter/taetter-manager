@@ -1,11 +1,11 @@
-import { getDb } from "./db";
+import { getDb } from "./db.js";
 import {
   tenants,
   users,
   vaccines,
   employees,
   type InsertUser,
-} from "../drizzle/schema";
+} from "../drizzle/schema.js";
 import { nanoid } from "nanoid";
 import { eq } from "drizzle-orm";
 

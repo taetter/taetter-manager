@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { router } from "../_core/trpc";
-import { tenantProcedure, getTenantId } from "../tenantMiddleware";
-import { getDb } from "../db";
+import { router } from "../_core/trpc.js";
+import { tenantProcedure, getTenantId } from "../tenantMiddleware.js";
+import { getDb } from "../db.js";
 import { patients, patientDocuments } from "../../drizzle/schema";
 import { eq, and, like, or, isNull, desc, not, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";

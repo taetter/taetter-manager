@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { router } from "../_core/trpc";
-import { tenantProcedure } from "../tenantMiddleware";
-import { getDb } from "../db";
+import { router } from "../_core/trpc.js";
+import { tenantProcedure } from "../tenantMiddleware.js";
+import { getDb } from "../db.js";
 import { budgets, vaccines, vaccinePrices, priceCampaigns } from "../../drizzle/schema";
 import { eq, and, desc, lte, gte, or, isNull } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";

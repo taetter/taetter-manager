@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { appRouter } from "./routers";
-import { getDb } from "./db";
-import { vaccines, refrigerators } from "../drizzle/schema";
+import { appRouter } from "./routers.js";
+import { getDb } from "./db.js";
+import { vaccines, refrigerators } from "../drizzle/schema.js";
 import { eq, and } from "drizzle-orm";
 
 describe("Vaccines Transfer Router", () => {

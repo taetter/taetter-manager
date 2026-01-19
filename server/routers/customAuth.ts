@@ -2,9 +2,9 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { users } from "../../drizzle/schema";
-import { getDb } from "../db";
-import { publicProcedure, router } from "../_core/trpc";
-import { supabase, supabaseAdmin } from "../_core/supabase";
+import { getDb } from "../db.js";
+import { publicProcedure, router } from "../_core/trpc.js";
+import { supabase, supabaseAdmin } from "../_core/supabase.js";
 
 /**
  * Custom authentication router using Supabase Auth

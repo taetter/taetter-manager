@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import { getDb } from "../db";
+import { getDb } from "../db.js";
 import { tenants } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 
