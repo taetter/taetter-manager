@@ -1,35 +1,101 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
+import { signIn, initSupabase } from "@/lib/supabase";
+
+/**
+ * Master Login Page
+ * Authentication for super_admin users (Master Dashboard access)
+ * 
+ * SECURITY:
+ * - Uses Supabase Auth for authentication
+ * - Validates role server-side via tRPC
+ * - Redirects based on user role and tenantId
+ * 
+ * VISUAL IDENTITY:
+ * - Dark theme (slate-950) matching landing page
+ * - Gold accents (#d4af37) for premium feel
+ * - Differentiated from tenant login (light theme)
+ */
 
 export default function Login() {
   const [, setLocation] = useLocation();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const loginMutation = trpc.customAuth.login.useMutation({
-    onSuccess: (data) => {
-      toast.success(`Bem-vindo, ${data.user.name || data.user.username}!`);
-      // Redirect based on role
-      if (data.user.role === "super_admin") {
-        setLocation("/admin/dashboard");
-      } else if (data.user.tenantId) {
-        setLocation(`/tenant/${data.user.tenantId}/dashboard`);
-      } else {
-        setLocation("/");
-      }
-    },
-    onError: (error) => {
-      toast.error(error.message || "Erro ao fazer login");
-    },
-  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Get Supabase config from backend
+  const { data: supabaseConfig } = trpc.supabaseAuth.getConfig.useQuery();
+
+  // Initialize Supabase client
+  useEffect(() => {
+    if (supabaseConfig && !isInitialized) {
+      initSupabase(supabaseConfig.url, supabaseConfig.anonKey)
+        .then(() => {
+          setIsInitialized(true);
+        })
+        .catch((error) => {
+          console.error('[Supabase] Failed to initialize:', error);
+          toast.error('Erro ao inicializar autenticação');
+        });
+    }
+  }, [supabaseConfig, isInitialized]);
+
+  // Get current user info from our database
+  const { data: currentUser, refetch: refetchUser } = trpc.supabaseAuth.me.useQuery(
+    undefined,
+    { enabled: false }
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    loginMutation.mutate({ username, password });
+
+    if (!isInitialized) {
+      toast.error('Aguarde a inicialização...');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Step 1: Sign in with Supabase Auth
+      const { session } = await signIn(email, password);
+
+      if (!session) {
+        throw new Error('Falha ao criar sessão');
+      }
+
+      // Step 2: Get user info from our database
+      const { data: user } = await refetchUser();
+
+      if (!user) {
+        throw new Error('Usuário não encontrado no sistema');
+      }
+
+      // Step 3: Validate role (Master Login is for super_admin only)
+      if (user.role !== 'super_admin') {
+        toast.error('Acesso negado. Esta área é exclusiva para administradores.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Step 4: Success - redirect to Master Dashboard
+      toast.success(`Bem-vindo, ${user.name || user.email}!`);
+      setLocation('/admin/dashboard');
+    } catch (error) {
+      console.error('[Login] Error:', error);
+      toast.error(
+        error instanceof Error 
+          ? error.message 
+          : 'Erro ao fazer login. Verifique suas credenciais.'
+      );
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -57,19 +123,30 @@ export default function Login() {
             />
           </div>
 
+          {/* Title */}
+          <div className="mb-6 text-center">
+            <h1 className="text-xl font-light text-slate-200 tracking-wide">
+              Master Dashboard
+            </h1>
+            <p className="text-sm text-slate-400 mt-2">
+              Acesso exclusivo para administradores
+            </p>
+          </div>
+
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="username" className="text-slate-300 font-light">
-                Usuário
+              <Label htmlFor="email" className="text-slate-300 font-light">
+                E-mail
               </Label>
               <Input
-                id="username"
-                type="text"
-                placeholder="seu_usuario"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                id="email"
+                type="email"
+                placeholder="seu@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
+                disabled={!isInitialized}
                 className="h-12 bg-slate-800 border-slate-700 text-slate-100 placeholder:text-slate-500 focus:border-[#d4af37]/50 focus:ring-[#d4af37]/20"
               />
             </div>
@@ -85,20 +162,23 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={!isInitialized}
                 className="h-12 bg-slate-800 border-slate-700 text-slate-100 placeholder:text-slate-500 focus:border-[#d4af37]/50 focus:ring-[#d4af37]/20"
               />
             </div>
 
             <Button
               type="submit"
-              disabled={loginMutation.isPending}
+              disabled={isLoading || !isInitialized}
               className="w-full h-12 bg-[#d4af37] hover:bg-[#c4a030] text-slate-950 font-normal tracking-wide transition-all duration-300"
             >
-              {loginMutation.isPending ? (
+              {isLoading ? (
                 <div className="flex items-center justify-center gap-2">
-                  <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                  <div className="animate-spin h-4 w-4 border-2 border-slate-950 border-t-transparent rounded-full" />
                   Entrando...
                 </div>
+              ) : !isInitialized ? (
+                "Inicializando..."
               ) : (
                 "Entrar"
               )}
