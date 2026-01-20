@@ -1,5 +1,6 @@
 import { router } from "../_core/trpc.js";
 import { tenantProcedure } from "../tenantMiddleware.js";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { getDb } from "../db.js";
 import { 
@@ -335,7 +336,14 @@ export const integrationsRouter = router({
         tipoIntegracao: z.enum(["rnds_ria", "nfse", "nfe", "nfce"]).optional(),
       }))
       .query(async ({ input }) => {
-        const db = getDb();
+        const db = await getDb();
+        if (!db) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Database connection failed",
+          });
+        }
+        
         const conditions = [
           eq(integrationStats.tenantId, input.tenantId),
           gte(integrationStats.data, input.dataInicio),

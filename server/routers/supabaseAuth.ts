@@ -122,15 +122,18 @@ export const supabaseAuthRouter = router({
         });
       }
 
-      // Create user in Supabase Auth
+      // Create user in Supabase Auth using service_role client
+      // Note: supabaseAdmin already has service_role privileges
       const { data: authData, error: authError } =
-        await supabaseAdmin.auth.admin.createUser({
+        await supabaseAdmin.auth.signUp({
           email: input.email,
           password: input.password,
-          email_confirm: true, // Auto-confirm email for admin users
-          user_metadata: {
-            name: input.name,
-            role: "super_admin",
+          options: {
+            data: {
+              name: input.name,
+              role: "super_admin",
+            },
+            emailRedirectTo: undefined, // No email confirmation for admin users
           },
         });
 

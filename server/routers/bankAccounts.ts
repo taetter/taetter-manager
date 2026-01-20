@@ -16,19 +16,17 @@ export const bankAccountsRouter = router({
       const connection = await getDb();
       if (!connection) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database connection failed" });
 
-      let query = connection
-        .select()
-        .from(bankAccounts)
-        .where(eq(bankAccounts.tenantId, input.tenantId));
-
+      const conditions = [eq(bankAccounts.tenantId, input.tenantId)];
+      
       if (input.apenasAtivas) {
-        query = query.where(and(
-          eq(bankAccounts.tenantId, input.tenantId),
-          eq(bankAccounts.ativa, true)
-        )) as any;
+        conditions.push(eq(bankAccounts.ativa, true));
       }
 
-      const accounts = await query.orderBy(desc(bankAccounts.createdAt));
+      const accounts = await connection
+        .select()
+        .from(bankAccounts)
+        .where(and(...conditions))
+        .orderBy(desc(bankAccounts.createdAt));
       return accounts;
     }),
 
