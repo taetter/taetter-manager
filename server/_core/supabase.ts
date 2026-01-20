@@ -19,16 +19,23 @@ import { createClient } from '@supabase/supabase-js';
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+// Debug logging (will appear in Vercel logs)
+console.log('[Supabase Init] Environment check:', {
+  SUPABASE_URL: SUPABASE_URL ? `${SUPABASE_URL.substring(0, 30)}...` : 'MISSING',
+  SUPABASE_SERVICE_ROLE_KEY: SUPABASE_SERVICE_ROLE_KEY ? 'SET (hidden)' : 'MISSING',
+  NODE_ENV: process.env.NODE_ENV,
+});
+
 if (!SUPABASE_URL) {
-  throw new Error(
-    '[Supabase] SUPABASE_URL is required. Set it in Vercel environment variables.'
-  );
+  const error = '[Supabase] SUPABASE_URL is required. Set it in Vercel environment variables.';
+  console.error(error);
+  throw new Error(error);
 }
 
 if (!SUPABASE_SERVICE_ROLE_KEY) {
-  throw new Error(
-    '[Supabase] SUPABASE_SERVICE_ROLE_KEY is required. Set it in Vercel environment variables.'
-  );
+  const error = '[Supabase] SUPABASE_SERVICE_ROLE_KEY is required. Set it in Vercel environment variables.';
+  console.error(error);
+  throw new Error(error);
 }
 
 /**
