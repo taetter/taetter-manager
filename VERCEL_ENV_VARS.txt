@@ -1,0 +1,128 @@
+=============================================================================
+VARIÁVEIS DE AMBIENTE PARA VERCEL - TAETTER MANAGER
+=============================================================================
+
+INSTRUÇÕES:
+1. Acesse: https://vercel.com/taetters-projects/taetter-manager/settings/environment-variables
+2. APAGUE todas as variáveis existentes (exceto as que começam com BUILT_IN_*)
+3. Adicione APENAS as variáveis abaixo
+4. Marque "Production", "Preview" e "Development" para TODAS (exceto SERVICE_ROLE_KEY)
+5. Clique em "Save" após adicionar cada uma
+6. Faça REDEPLOY após adicionar todas
+
+=============================================================================
+VARIÁVEIS OBRIGATÓRIAS (ADICIONAR NO VERCEL)
+=============================================================================
+
+---
+1. SUPABASE_URL
+---
+Value:
+https://jqikzhgjkmgnnescocqo.supabase.co
+
+Environments: ✅ Production ✅ Preview ✅ Development
+
+
+---
+2. SUPABASE_ANON_KEY
+---
+Value:
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxaWt6aGdqa21nbm5lc2NvY3FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg2NDk4NDcsImV4cCI6MjA4NDIyNTg0N30.S2wRsp4tmwqHZ8bvuwsJTvkByt23doxvb4MTc0ogsl0
+
+Environments: ✅ Production ✅ Preview ✅ Development
+
+
+---
+3. SUPABASE_SERVICE_ROLE_KEY (⚠️ PRODUCTION ONLY!)
+---
+Value:
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxaWt6aGdqa21nbm5lc2NvY3FvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODY0OTg0NywiZXhwIjoyMDg0MjI1ODQ3fQ.QsSZVjkUCdcnsCYJxxbc5TncyIbdcFv54QFRqtH261s
+
+Environments: ✅ Production ⛔ Preview ⛔ Development
+
+⚠️ CRÍTICO: Esta chave NUNCA deve estar em Preview/Development por segurança!
+
+
+=============================================================================
+VARIÁVEIS OPCIONAIS (Frontend - Vite)
+=============================================================================
+
+Se você quiser que o frontend também acesse o Supabase diretamente (não obrigatório):
+
+---
+4. VITE_SUPABASE_URL (Opcional)
+---
+Value:
+https://jqikzhgjkmgnnescocqo.supabase.co
+
+Environments: ✅ Production ✅ Preview ✅ Development
+
+
+---
+5. VITE_SUPABASE_ANON_KEY (Opcional)
+---
+Value:
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxaWt6aGdqa21nbm5lc2NvY3FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg2NDk4NDcsImV4cCI6MjA4NDIyNTg0N30.S2wRsp4tmwqHZ8bvuwsJTvkByt23doxvb4MTc0ogsl0
+
+Environments: ✅ Production ✅ Preview ✅ Development
+
+
+=============================================================================
+VARIÁVEIS QUE JÁ EXISTEM (NÃO APAGAR)
+=============================================================================
+
+Mantenha estas variáveis que já existem no Vercel:
+- DATABASE_URL
+- JWT_SECRET
+- VITE_APP_TITLE
+- Qualquer variável que comece com BUILT_IN_*
+
+
+=============================================================================
+CHECKLIST PÓS-CONFIGURAÇÃO
+=============================================================================
+
+Após adicionar as variáveis:
+
+1. ✅ Verificar que SUPABASE_URL foi adicionada (sem VITE_)
+2. ✅ Verificar que SUPABASE_ANON_KEY foi adicionada (sem VITE_)
+3. ✅ Verificar que SUPABASE_SERVICE_ROLE_KEY está APENAS em Production
+4. ✅ Fazer REDEPLOY:
+   - Vá em Deployments
+   - Clique nos 3 pontos do último deployment
+   - Clique em "Redeploy"
+5. ✅ Aguardar build completar (1-2 minutos)
+6. ✅ Testar login em https://www.taetter.com.br/login
+
+
+=============================================================================
+RESUMO: O QUE ESTAVA ERRADO
+=============================================================================
+
+❌ ANTES: Você tinha VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY
+   → Essas variáveis são APENAS para o frontend (Vite)
+   → O backend Node.js NÃO consegue acessar variáveis com prefixo VITE_
+
+✅ AGORA: Você vai adicionar SUPABASE_URL e SUPABASE_ANON_KEY (sem VITE_)
+   → O backend consegue acessar essas variáveis
+   → O frontend também consegue (via tRPC)
+
+
+=============================================================================
+DÚVIDAS FREQUENTES
+=============================================================================
+
+Q: Por que preciso de SUPABASE_URL e VITE_SUPABASE_URL?
+A: SUPABASE_URL é para o backend (Node.js server)
+   VITE_SUPABASE_URL é para o frontend (browser)
+   Neste projeto, o frontend pega a config via tRPC, então VITE_* é opcional.
+
+Q: Por que SERVICE_ROLE_KEY só em Production?
+A: Essa chave bypassa todas as políticas de segurança (RLS).
+   Se vazar em Preview/Development (via logs, screenshots), é perigoso.
+
+Q: Preciso fazer redeploy?
+A: SIM! Env vars só são aplicadas em novos deployments, não retroativamente.
+
+
+=============================================================================
