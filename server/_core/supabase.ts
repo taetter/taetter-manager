@@ -23,19 +23,15 @@ const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 console.log('[Supabase Init] Environment check:', {
   SUPABASE_URL: SUPABASE_URL ? `${SUPABASE_URL.substring(0, 30)}...` : 'MISSING',
   SUPABASE_SERVICE_ROLE_KEY: SUPABASE_SERVICE_ROLE_KEY ? 'SET (hidden)' : 'MISSING',
+  SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY ? 'SET (hidden)' : 'MISSING',
   NODE_ENV: process.env.NODE_ENV,
 });
 
-if (!SUPABASE_URL) {
-  const error = '[Supabase] SUPABASE_URL is required. Set it in Vercel environment variables.';
-  console.error(error);
-  throw new Error(error);
-}
-
-if (!SUPABASE_SERVICE_ROLE_KEY) {
-  const error = '[Supabase] SUPABASE_SERVICE_ROLE_KEY is required. Set it in Vercel environment variables.';
-  console.error(error);
-  throw new Error(error);
+// Graceful degradation: warn but don't crash if env vars missing
+if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+  console.warn('[Supabase] WARNING: Missing required environment variables');
+  console.warn('[Supabase] Supabase features will be disabled until env vars are configured');
+  console.warn('[Supabase] Required: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, SUPABASE_ANON_KEY');
 }
 
 /**
@@ -47,16 +43,18 @@ if (!SUPABASE_SERVICE_ROLE_KEY) {
  * - Admin operations (support, auditing)
  * - Bypass RLS for system operations
  */
-export const supabaseAdmin = createClient(
-  SUPABASE_URL,
-  SUPABASE_SERVICE_ROLE_KEY,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  }
-);
+export const supabaseAdmin = (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY)
+  ? createClient(
+      SUPABASE_URL,
+      SUPABASE_SERVICE_ROLE_KEY,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      }
+    )
+  : null as any; // Fallback when env vars missing
 
 /**
  * Type-safe database access
@@ -75,9 +73,9 @@ export const supabaseDb = supabaseAdmin;
 export function getSupabasePublicConfig() {
   const anonKey = process.env.SUPABASE_ANON_KEY;
   
-  if (!anonKey) {
+  if (!anonKey || !SUPABASE_URL) {
     throw new Error(
-      '[Supabase] SUPABASE_ANON_KEY is required for frontend config.'
+      '[Supabase] SUPABASE_URL and SUPABASE_ANON_KEY are required. Check Vercel environment variables.'
     );
   }
   
