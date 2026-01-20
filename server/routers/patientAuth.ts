@@ -102,8 +102,8 @@ export const patientAuthRouter = router({
         tenantId,
         patientId: patient.id,
         token,
-        ipAddress: ctx.req?.ip || null,
-        userAgent: ctx.req?.headers["user-agent"] || null,
+        ipAddress: (ctx.req as any)?.ip || (ctx.req as any)?.socket?.remoteAddress || null,
+        userAgent: ctx.req?.headers?.["user-agent"] as string || null,
         expiresAt,
       });
 

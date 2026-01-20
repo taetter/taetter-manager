@@ -1,4 +1,8 @@
-import type { CookieOptions, Request } from "express";
+import type { CookieOptions, Request as ExpressRequest } from "express";
+import type { IncomingMessage } from "http";
+
+// Union type to support both Express Request and tRPC context request
+type Request = ExpressRequest | (IncomingMessage & { headers: Record<string, string | string[] | undefined> });
 
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "::1"]);
 
@@ -9,21 +13,22 @@ function isIpAddress(host: string) {
 }
 
 function isSecureRequest(req: Request) {
-  if (req.protocol === "https") return true;
+  // Check if it's an Express request with protocol property
+  if ('protocol' in req && req.protocol === "https") return true;
 
-  const forwardedProto = req.headers["x-forwarded-proto"];
+  const forwardedProto = req.headers?.["x-forwarded-proto"];
   if (!forwardedProto) return false;
 
   const protoList = Array.isArray(forwardedProto)
     ? forwardedProto
     : forwardedProto.split(",");
 
-  return protoList.some(proto => proto.trim().toLowerCase() === "https");
+  return protoList.some((proto: string) => proto.trim().toLowerCase() === "https");
 }
 
 export function getSessionCookieOptions(
   req: Request
-): Pick<CookieOptions, "domain" | "httpOnly" | "path" | "sameSite" | "secure"> {
+): Partial<CookieOptions> {
   // const hostname = req.hostname;
   // const shouldSetDomain =
   //   hostname &&
@@ -44,5 +49,6 @@ export function getSessionCookieOptions(
     path: "/",
     sameSite: isSecureRequest(req) ? "none" : "lax",
     secure: isSecureRequest(req),
+    domain: undefined, // Let browser handle domain
   };
 }
