@@ -1,33 +1,68 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, index, decimal, date, json, datetime } from "drizzle-orm/mysql-core";
+import { int, serial, pgEnum, pgTable, text, timestamp, varchar, boolean, index, decimal, date, json } from "drizzle-orm/pg-core";
 
-/**
- * Core user table backing auth flow.
- * Extend this file with additional tables as your product grows.
- * Columns use camelCase to match both database fields and generated types.
- */
-export const users = mysqlTable("users", {
-  /**
-   * Surrogate primary key. Auto-incremented numeric value managed by the database.
-   * Use this for relations between tables.
-   */
-  id: int("id").autoincrement().primaryKey(),
-  /** Supabase Auth user ID (primary authentication method) */
-  supabaseUserId: varchar("supabaseUserId", { length: 36 }).unique(),
-  /** Manus OAuth identifier (openId) returned from the OAuth callback. Legacy fallback. */
-  openId: varchar("openId", { length: 64 }).unique(),
-  /** Username for custom authentication (DEPRECATED - use Supabase Auth) */
-  username: varchar("username", { length: 64 }).unique(),
-  /** Hashed password for custom authentication (DEPRECATED - use Supabase Auth) */
-  passwordHash: varchar("passwordHash", { length: 255 }),
-  name: text("name"),
-  email: varchar("email", { length: 320 }),
-  loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["user", "admin", "super_admin"]).default("user").notNull(),
-  tenantId: int("tenantId"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-  lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
-});
+
+
+
+// Enum declarations (PostgreSQL requires these before table definitions)
+export const ambienteEnum = pgEnum("ambiente", ["homologacao", "producao"]);
+export const environmentEnum = pgEnum("environment", ["homologation", "production"]);
+export const estadoCivilEnum = pgEnum("estadoCivil", ["solteiro", "casado", "divorciado", "viuvo", "outro"]);
+export const gravidadeEnum = pgEnum("gravidade", ["baixa", "media", "alta", "critica"]);
+export const gravidadeEnum1 = pgEnum("gravidade", ["leve", "moderada", "grave"]);
+export const metodoPagamentoEnum = pgEnum("metodoPagamento", ["dinheiro", "pix", "debito", "credito", "boleto"]);
+export const perfilEnum = pgEnum("perfil", ["gestor", "aplicador", "global", "suporte", "administrativo", "financeiro"]);
+export const planEnum = pgEnum("plan", ["basic", "intermediate", "full"]);
+export const regiaoEnum = pgEnum("regiao", ["grande_campinas", "regiao_entorno", "outra"]);
+export const regimeTributarioEnum = pgEnum("regimeTributario", ["simples_nacional", "lucro_presumido", "lucro_real"]);
+export const relacaoEnum = pgEnum("relacao", ["mae", "pai", "tutor", "outro"]);
+export const roleEnum = pgEnum("role", ["user", "admin", "super_admin"]);
+export const sexoEnum = pgEnum("sexo", ["masculino", "feminino", "outro"]);
+export const sexoEnum1 = pgEnum("sexo", ["M", "F", "Outro"]);
+export const statusEnum = pgEnum("status", ["reservada", "aplicada", "cancelada", "expirada"]);
+export const statusEnum1 = pgEnum("status", ["ativo", "inativo", "suspenso"]);
+export const statusEnum10 = pgEnum("status", ["pendente", "em_andamento", "concluida", "aprovada", "reprovada"]);
+export const statusEnum11 = pgEnum("status", ["aberta", "em_analise", "em_tratamento", "resolvida", "fechada"]);
+export const statusEnum12 = pgEnum("status", ["agendada", "em_andamento", "concluida", "cancelada"]);
+export const statusEnum13 = pgEnum("status", ["planejado", "realizado", "cancelado"]);
+export const statusEnum14 = pgEnum("status", ["ativo", "ferias", "afastado", "demitido"]);
+export const statusEnum15 = pgEnum("status", ["rascunho", "calculado", "aprovado", "pago"]);
+export const statusEnum16 = pgEnum("status", ["normal", "falta", "atestado", "ferias", "folga"]);
+export const statusEnum17 = pgEnum("status", ["pendente", "aprovado", "reprovado", "pago"]);
+export const statusEnum18 = pgEnum("status", ["pendente", "aprovada", "reprovada"]);
+export const statusEnum19 = pgEnum("status", ["registrado", "em_analise", "encerrado"]);
+export const statusEnum2 = pgEnum("status", ["pendente", "pago", "cancelado"]);
+export const statusEnum20 = pgEnum("status", ["pendente", "enviando", "enviado", "aceito", "rejeitado", "erro"]);
+export const statusEnum21 = pgEnum("status", ["pendente", "confirmado", "realizado", "cancelado"]);
+export const statusEnum22 = pgEnum("status", ["pendente", "aprovado", "recusado", "convertido", "expirado", "cancelado"]);
+export const statusEnum23 = pgEnum("status", ["planejada", "em_andamento", "concluida", "cancelada"]);
+export const statusEnum3 = pgEnum("status", ["pendente", "aplicada", "cancelada"]);
+export const statusEnum4 = pgEnum("status", ["pendente", "aprovado", "recusado", "cancelado"]);
+export const statusEnum5 = pgEnum("status", ["pendente", "pago", "cancelado", "estornado"]);
+export const statusEnum6 = pgEnum("status", ["pendente", "pago", "atrasado", "cancelado"]);
+export const statusEnum7 = pgEnum("status", ["rascunho", "emitida", "autorizada", "cancelada", "denegada"]);
+export const statusEnum8 = pgEnum("status", ["ativo", "revisao", "obsoleto"]);
+export const statusEnum9 = pgEnum("status", ["valido", "vencido", "em_renovacao", "suspenso"]);
+export const tipoContaEnum = pgEnum("tipoConta", ["corrente", "poupanca", "pagamento"]);
+export const tipoContratoEnum = pgEnum("tipoContrato", ["clt", "pj", "estagio", "temporario", "autonomo"]);
+export const tipoDescontoEnum = pgEnum("tipoDesconto", ["percentual", "valor_fixo"]);
+export const tipoEnum = pgEnum("tipo", ["unidade", "domiciliar"]);
+export const tipoEnum1 = pgEnum("tipo", ["entrada", "saida", "ajuste", "perda"]);
+export const tipoEnum10 = pgEnum("tipo", ["normal", "noturna", "feriado", "domingo"]);
+export const tipoEnum11 = pgEnum("tipo", ["ferias", "atestado", "licenca_maternidade", "licenca_paternidade", "falta_justificada", "falta_injustificada", "outro"]);
+export const tipoEnum2 = pgEnum("tipo", ["receita", "despesa"]);
+export const tipoEnum3 = pgEnum("tipo", ["pix", "credito", "debito", "dinheiro"]);
+export const tipoEnum4 = pgEnum("tipo", ["credito", "debito"]);
+export const tipoEnum5 = pgEnum("tipo", ["alvara", "licenca", "certificado", "laudo", "protocolo", "outro"]);
+export const tipoEnum6 = pgEnum("tipo", ["vigilancia_sanitaria", "acreditacao", "interna", "fornecedor", "outro"]);
+export const tipoEnum7 = pgEnum("tipo", ["reacao_pos_vacinal", "efeito_adverso", "reclamacao", "sugestao", "elogio", "outro"]);
+export const tipoEnum8 = pgEnum("tipo", ["admissao", "reciclagem", "capacitacao", "workshop", "palestra", "curso", "outro"]);
+export const tipoEnum9 = pgEnum("tipo", ["vale_transporte", "vale_refeicao", "vale_alimentacao", "plano_saude", "plano_odontologico", "seguro_vida", "outro"]);
+export const tipoEquipamentoEnum = pgEnum("tipoEquipamento", ["geladeira", "freezer", "ar_condicionado", "gerador", "computador", "impressora", "outro"]);
+export const tipoEquipamentoEnum1 = pgEnum("tipoEquipamento", ["geladeira", "caixa_transporte", "freezer", "camara_fria"]);
+export const tipoEtiquetaEnum = pgEnum("tipoEtiqueta", ["fisica_virtual", "somente_virtual"]);
+export const tipoIntegracaoEnum = pgEnum("tipoIntegracao", ["rnds_ria", "nfse", "nfe", "nfce"]);
+export const tipoManutencaoEnum = pgEnum("tipoManutencao", ["preventiva", "corretiva", "preditiva"]);
+export const tipoNotaEnum = pgEnum("tipoNota", ["nfse", "nfe", "nfce"]);
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
@@ -35,8 +70,8 @@ export type InsertUser = typeof users.$inferInsert;
 /**
  * Tenants table - Represents each clinic in the multi-tenant system
  */
-export const tenants = mysqlTable("tenants", {
-  id: int("id").autoincrement().primaryKey(),
+export const tenants = pgTable("tenants", {
+  id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   cnpj: varchar("cnpj", { length: 18 }).notNull().unique(),
   razaoSocial: varchar("razaoSocial", { length: 255 }).notNull(),
@@ -56,8 +91,8 @@ export const tenants = mysqlTable("tenants", {
   responsavelTelefone: varchar("responsavelTelefone", { length: 20 }),
   
   // Status e controle
-  status: mysqlEnum("status", ["ativo", "inativo", "suspenso"]).default("ativo").notNull(),
-  plan: mysqlEnum("plan", ["basic", "intermediate", "full"]).default("basic").notNull(),
+  status: statusEnum1.default("ativo").notNull(),
+  plan: planEnum.default("basic").notNull(),
   enabledModules: json("enabledModules").$type<string[]>(), // Array de IDs dos módulos habilitados
   dataExpiracao: timestamp("dataExpiracao"),
   
@@ -70,7 +105,7 @@ export const tenants = mysqlTable("tenants", {
   databaseHost: varchar("databaseHost", { length: 255 }), // Host do banco isolado
   databasePort: int("databasePort").default(3306), // Porta do banco isolado
   subdomain: varchar("subdomain", { length: 100 }).unique(), // Subdomínio dedicado (ex: imunevida)
-  environment: mysqlEnum("environment", ["homologation", "production"]).default("homologation").notNull(),
+  environment: environmentEnum.default("homologation").notNull(),
   homologationStartedAt: timestamp("homologationStartedAt"), // Início da homologação
   productionActivatedAt: timestamp("productionActivatedAt"), // Ativação em produção
   version: int("version").default(1).notNull(), // Versionamento do tenant
@@ -87,7 +122,7 @@ export const tenants = mysqlTable("tenants", {
   secondaryColor: varchar("secondaryColor", { length: 7 }),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
   deletedAt: timestamp("deletedAt"), // Soft delete
 }, (table) => ({
   cnpjIdx: index("cnpj_idx").on(table.cnpj),
@@ -100,8 +135,8 @@ export type InsertTenant = typeof tenants.$inferInsert;
 /**
  * Audit logs table - Track all tenant management actions
  */
-export const auditLogs = mysqlTable("auditLogs", {
-  id: int("id").autoincrement().primaryKey(),
+export const auditLogs = pgTable("auditLogs", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId"),
   userId: int("userId").notNull(),
   action: varchar("action", { length: 100 }).notNull(), // create, update, delete, activate, deactivate
@@ -132,8 +167,8 @@ export type InsertAuditLog = typeof auditLogs.$inferInsert;
 /**
  * Patients table - Main patient registry
  */
-export const patients = mysqlTable("patients", {
-  id: int("id").autoincrement().primaryKey(),
+export const patients = pgTable("patients", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   
   // Dados pessoais
@@ -141,7 +176,7 @@ export const patients = mysqlTable("patients", {
   cpf: varchar("cpf", { length: 14 }).notNull(),
   rg: varchar("rg", { length: 20 }),
   dataNascimento: timestamp("dataNascimento").notNull(),
-  sexo: mysqlEnum("sexo", ["M", "F", "Outro"]),
+  sexo: sexoEnum1,
   nomeMae: varchar("nomeMae", { length: 255 }),
   nomePai: varchar("nomePai", { length: 255 }),
   
@@ -178,7 +213,7 @@ export const patients = mysqlTable("patients", {
   ativo: boolean("ativo").default(true).notNull(),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
   deletedAt: timestamp("deletedAt"),
 }, (table) => ({
   tenantIdx: index("patient_tenant_idx").on(table.tenantId),
@@ -192,8 +227,8 @@ export type InsertPatient = typeof patients.$inferInsert;
 /**
  * Patient documents table - Store patient document references
  */
-export const patientDocuments = mysqlTable("patientDocuments", {
-  id: int("id").autoincrement().primaryKey(),
+export const patientDocuments = pgTable("patientDocuments", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   patientId: int("patientId").notNull(),
   
@@ -216,8 +251,8 @@ export type InsertPatientDocument = typeof patientDocuments.$inferInsert;
 /**
  * Patient sessions table - Track patient portal authentication
  */
-export const patientSessions = mysqlTable("patientSessions", {
-  id: int("id").autoincrement().primaryKey(),
+export const patientSessions = pgTable("patientSessions", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   patientId: int("patientId").notNull(),
   
@@ -240,17 +275,17 @@ export type InsertPatientSession = typeof patientSessions.$inferInsert;
  * Patient guardians table - Relationship between minors and their legal guardians
  * Both minor and guardian must be registered as patients
  */
-export const patientGuardians = mysqlTable("patientGuardians", {
-  id: int("id").autoincrement().primaryKey(),
+export const patientGuardians = pgTable("patientGuardians", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   minorPatientId: int("minorPatientId").notNull(), // ID do paciente menor de idade
   guardianPatientId: int("guardianPatientId").notNull(), // ID do paciente responsável
   
-  relacao: mysqlEnum("relacao", ["mae", "pai", "tutor", "outro"]).notNull(), // Tipo de relacionamento
+  relacao: relacaoEnum.notNull(), // Tipo de relacionamento
   observacoes: text("observacoes"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("guardian_tenant_idx").on(table.tenantId),
   minorIdx: index("guardian_minor_idx").on(table.minorPatientId),
@@ -265,8 +300,8 @@ export type InsertPatientGuardian = typeof patientGuardians.$inferInsert;
 /**
  * Vaccines table - Vaccine catalog
  */
-export const vaccines = mysqlTable("vaccines", {
-  id: int("id").autoincrement().primaryKey(),
+export const vaccines = pgTable("vaccines", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   refrigeratorId: int("refrigeratorId"), // Opcional: qual geladeira armazena
   
@@ -305,7 +340,7 @@ export const vaccines = mysqlTable("vaccines", {
   ativo: boolean("ativo").default(true).notNull(),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("vaccine_tenant_idx").on(table.tenantId),
   loteIdx: index("vaccine_lote_idx").on(table.lote),
@@ -318,12 +353,12 @@ export type InsertVaccine = typeof vaccines.$inferInsert;
 /**
  * Stock movements table - Track vaccine stock changes
  */
-export const stockMovements = mysqlTable("stockMovements", {
-  id: int("id").autoincrement().primaryKey(),
+export const stockMovements = pgTable("stockMovements", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   vaccineId: int("vaccineId").notNull(),
   
-  tipo: mysqlEnum("tipo", ["entrada", "saida", "ajuste", "perda"]).notNull(),
+  tipo: tipoEnum1.notNull(),
   quantidade: int("quantidade").notNull(),
   quantidadeAnterior: int("quantidadeAnterior").notNull(),
   quantidadeNova: int("quantidadeNova").notNull(),
@@ -348,8 +383,8 @@ export type InsertStockMovement = typeof stockMovements.$inferInsert;
 /**
  * Applications table - Vaccine applications registry
  */
-export const applications = mysqlTable("applications", {
-  id: int("id").autoincrement().primaryKey(),
+export const applications = pgTable("applications", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   patientId: int("patientId").notNull(),
   vaccineId: int("vaccineId").notNull(),
@@ -377,7 +412,7 @@ export const applications = mysqlTable("applications", {
   rndsErro: text("rndsErro"),
   
   // Etiquetas
-  tipoEtiqueta: mysqlEnum("tipoEtiqueta", ["fisica_virtual", "somente_virtual"]),
+  tipoEtiqueta: tipoEtiquetaEnum,
   etiquetaFisicaGerada: boolean("etiquetaFisicaGerada").default(false),
   etiquetaVirtualGerada: boolean("etiquetaVirtualGerada").default(false),
   etiquetaZPL: text("etiquetaZPL"), // Código ZPL para impressão Zebra
@@ -393,7 +428,7 @@ export const applications = mysqlTable("applications", {
   observacoes: text("observacoes"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("app_tenant_idx").on(table.tenantId),
   patientIdx: index("app_patient_idx").on(table.patientId),
@@ -407,14 +442,14 @@ export type InsertApplication = typeof applications.$inferInsert;
 /**
  * Adverse events table - Track vaccine adverse reactions
  */
-export const adverseEvents = mysqlTable("adverseEvents", {
-  id: int("id").autoincrement().primaryKey(),
+export const adverseEvents = pgTable("adverseEvents", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   applicationId: int("applicationId").notNull(),
   patientId: int("patientId").notNull(),
   
   tipo: varchar("tipo", { length: 100 }).notNull(), // Febre, dor local, alergia, etc
-  gravidade: mysqlEnum("gravidade", ["leve", "moderada", "grave"]).notNull(),
+  gravidade: gravidadeEnum1.notNull(),
   descricao: text("descricao").notNull(),
   
   dataOcorrencia: timestamp("dataOcorrencia").notNull(),
@@ -427,7 +462,7 @@ export const adverseEvents = mysqlTable("adverseEvents", {
   protocoloNotificacao: varchar("protocoloNotificacao", { length: 100 }),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("adverse_tenant_idx").on(table.tenantId),
   applicationIdx: index("adverse_app_idx").on(table.applicationId),
@@ -442,11 +477,11 @@ export type InsertAdverseEvent = typeof adverseEvents.$inferInsert;
 /**
  * Transactions table - Financial transactions
  */
-export const transactions = mysqlTable("transactions", {
-  id: int("id").autoincrement().primaryKey(),
+export const transactions = pgTable("transactions", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   
-  tipo: mysqlEnum("tipo", ["receita", "despesa"]).notNull(),
+  tipo: tipoEnum2.notNull(),
   categoria: varchar("categoria", { length: 100 }).notNull(),
   descricao: varchar("descricao", { length: 255 }).notNull(),
   
@@ -458,7 +493,7 @@ export const transactions = mysqlTable("transactions", {
   
   // Pagamento
   formaPagamento: varchar("formaPagamento", { length: 50 }), // Dinheiro, cartão, PIX, etc
-  status: mysqlEnum("status", ["pendente", "pago", "cancelado"]).default("pendente").notNull(),
+  status: statusEnum2.default("pendente").notNull(),
   dataPagamento: timestamp("dataPagamento"),
   
   // Nota Fiscal
@@ -469,7 +504,7 @@ export const transactions = mysqlTable("transactions", {
   observacoes: text("observacoes"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("trans_tenant_idx").on(table.tenantId),
   tipoIdx: index("trans_tipo_idx").on(table.tipo),
@@ -485,8 +520,8 @@ export type InsertTransaction = typeof transactions.$inferInsert;
 /**
  * Employees table - Staff registry
  */
-export const employees = mysqlTable("employees", {
-  id: int("id").autoincrement().primaryKey(),
+export const employees = pgTable("employees", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   userId: int("userId"), // Link para users se tiver acesso ao sistema
   
@@ -516,7 +551,7 @@ export const employees = mysqlTable("employees", {
   observacoes: text("observacoes"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("emp_tenant_idx").on(table.tenantId),
   cpfIdx: index("emp_cpf_idx").on(table.cpf),
@@ -529,8 +564,8 @@ export type InsertEmployee = typeof employees.$inferInsert;
 /**
  * Employee certifications table - Professional certifications
  */
-export const employeeCertifications = mysqlTable("employeeCertifications", {
-  id: int("id").autoincrement().primaryKey(),
+export const employeeCertifications = pgTable("employeeCertifications", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   employeeId: int("employeeId").notNull(),
   
@@ -556,8 +591,8 @@ export type InsertEmployeeCertification = typeof employeeCertifications.$inferIn
 /**
  * Units table - Physical locations where vaccines are applied
  */
-export const units = mysqlTable("units", {
-  id: int("id").autoincrement().primaryKey(),
+export const units = pgTable("units", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   
   nome: varchar("nome", { length: 255 }).notNull(),
@@ -577,7 +612,7 @@ export const units = mysqlTable("units", {
   ativo: boolean("ativo").default(true).notNull(),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("unit_tenant_idx").on(table.tenantId),
 }));
@@ -588,8 +623,8 @@ export type InsertUnit = typeof units.$inferInsert;
 /**
  * Refrigerators table - Vaccine storage units
  */
-export const refrigerators = mysqlTable("refrigerators", {
-  id: int("id").autoincrement().primaryKey(),
+export const refrigerators = pgTable("refrigerators", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   unitId: int("unitId").notNull(),
   
@@ -607,7 +642,7 @@ export const refrigerators = mysqlTable("refrigerators", {
   ativo: boolean("ativo").default(true).notNull(),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("refrig_tenant_idx").on(table.tenantId),
   unitIdx: index("refrig_unit_idx").on(table.unitId),
@@ -621,8 +656,8 @@ export type InsertRefrigerator = typeof refrigerators.$inferInsert;
 /**
  * Vaccine applications table - Records of vaccine applications
  */
-export const vaccineApplications = mysqlTable("vaccineApplications", {
-  id: int("id").autoincrement().primaryKey(),
+export const vaccineApplications = pgTable("vaccineApplications", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   patientId: int("patientId").notNull(),
   vaccineId: int("vaccineId").notNull(),
@@ -642,10 +677,10 @@ export const vaccineApplications = mysqlTable("vaccineApplications", {
   
   observacoes: text("observacoes"),
   
-  status: mysqlEnum("status", ["pendente", "aplicada", "cancelada"]).default("pendente").notNull(),
+  status: statusEnum3.default("pendente").notNull(),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("app_tenant_idx").on(table.tenantId),
   patientIdx: index("app_patient_idx").on(table.patientId),
@@ -659,12 +694,12 @@ export type InsertVaccineApplication = typeof vaccineApplications.$inferInsert;
 /**
  * Payments table - Payment records for vaccine applications
  */
-export const payments = mysqlTable("payments", {
-  id: int("id").autoincrement().primaryKey(),
+export const payments = pgTable("payments", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   applicationId: int("applicationId").notNull(),
   
-  tipo: mysqlEnum("tipo", ["pix", "credito", "debito", "dinheiro"]).notNull(),
+  tipo: tipoEnum3.notNull(),
   valor: decimal("valor", { precision: 10, scale: 2 }).notNull(),
   
   // PIX
@@ -680,14 +715,14 @@ export const payments = mysqlTable("payments", {
   comprovanteUrl: text("comprovanteUrl"),
   comprovanteKey: varchar("comprovanteKey", { length: 255 }),
   
-  status: mysqlEnum("status", ["pendente", "aprovado", "recusado", "cancelado"]).default("pendente").notNull(),
+  status: statusEnum4.default("pendente").notNull(),
   
   dataHora: timestamp("dataHora").defaultNow().notNull(),
   
   observacoes: text("observacoes"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("pay_tenant_idx").on(table.tenantId),
   applicationIdx: index("pay_application_idx").on(table.applicationId),
@@ -701,8 +736,8 @@ export type InsertPayment = typeof payments.$inferInsert;
 /**
  * Refrigerator maintenances table - Maintenance records
  */
-export const refrigeratorMaintenances = mysqlTable("refrigeratorMaintenances", {
-  id: int("id").autoincrement().primaryKey(),
+export const refrigeratorMaintenances = pgTable("refrigeratorMaintenances", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   refrigeratorId: int("refrigeratorId").notNull(),
   
@@ -718,7 +753,7 @@ export const refrigeratorMaintenances = mysqlTable("refrigeratorMaintenances", {
   observacoes: text("observacoes"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("maint_tenant_idx").on(table.tenantId),
   refrigIdx: index("maint_refrig_idx").on(table.refrigeratorId),
@@ -731,8 +766,8 @@ export type InsertRefrigeratorMaintenance = typeof refrigeratorMaintenances.$inf
 /**
  * Temperature logs table - Temperature monitoring
  */
-export const temperatureLogs = mysqlTable("temperatureLogs", {
-  id: int("id").autoincrement().primaryKey(),
+export const temperatureLogs = pgTable("temperatureLogs", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   refrigeratorId: int("refrigeratorId").notNull(),
   
@@ -757,8 +792,8 @@ export type InsertTemperatureLog = typeof temperatureLogs.$inferInsert;
 /**
  * Quotations table - Price quotations from suppliers
  */
-export const quotations = mysqlTable("quotations", {
-  id: int("id").autoincrement().primaryKey(),
+export const quotations = pgTable("quotations", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   
   numero: varchar("numero", { length: 50 }).notNull(),
@@ -780,7 +815,7 @@ export const quotations = mysqlTable("quotations", {
   dataAprovacao: timestamp("dataAprovacao"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("quot_tenant_idx").on(table.tenantId),
   statusIdx: index("quot_status_idx").on(table.status),
@@ -793,8 +828,8 @@ export type InsertQuotation = typeof quotations.$inferInsert;
 /**
  * Quotation items table - Items in a quotation
  */
-export const quotationItems = mysqlTable("quotationItems", {
-  id: int("id").autoincrement().primaryKey(),
+export const quotationItems = pgTable("quotationItems", {
+  id: serial("id").primaryKey(),
   quotationId: int("quotationId").notNull(),
   
   nomeVacina: varchar("nomeVacina", { length: 255 }).notNull(),
@@ -821,16 +856,16 @@ export type InsertQuotationItem = typeof quotationItems.$inferInsert;
 /**
  * Financial transactions table - All financial movements
  */
-export const financialTransactions = mysqlTable("financialTransactions", {
-  id: int("id").autoincrement().primaryKey(),
+export const financialTransactions = pgTable("financialTransactions", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   
   // Tipo de transação
-  tipo: mysqlEnum("tipo", ["receita", "despesa"]).notNull(),
+  tipo: tipoEnum2.notNull(),
   categoria: varchar("categoria", { length: 100 }).notNull(), // aplicacao_vacina, venda_produto, pagamento_fornecedor, etc
   
   // Método de pagamento
-  metodoPagamento: mysqlEnum("metodoPagamento", ["dinheiro", "pix", "debito", "credito", "boleto"]).notNull(),
+  metodoPagamento: metodoPagamentoEnum.notNull(),
   
   // Valores
   valor: decimal("valor", { precision: 12, scale: 2 }).notNull(),
@@ -842,7 +877,7 @@ export const financialTransactions = mysqlTable("financialTransactions", {
   dataPagamento: date("dataPagamento"),
   
   // Status
-  status: mysqlEnum("status", ["pendente", "pago", "cancelado", "estornado"]).default("pendente").notNull(),
+  status: statusEnum5.default("pendente").notNull(),
   conciliado: boolean("conciliado").default(false).notNull(),
   dataConciliacao: timestamp("dataConciliacao"),
   
@@ -860,7 +895,7 @@ export const financialTransactions = mysqlTable("financialTransactions", {
   numeroParcelas: int("numeroParcelas"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("fintrans_tenant_idx").on(table.tenantId),
   tipoIdx: index("fintrans_tipo_idx").on(table.tipo),
@@ -875,8 +910,8 @@ export type InsertFinancialTransaction = typeof financialTransactions.$inferInse
 /**
  * Installments table - Installment payments (credit card)
  */
-export const installments = mysqlTable("installments", {
-  id: int("id").autoincrement().primaryKey(),
+export const installments = pgTable("installments", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   transactionId: int("transactionId").notNull(),
   
@@ -888,12 +923,12 @@ export const installments = mysqlTable("installments", {
   dataVencimento: date("dataVencimento").notNull(),
   dataPagamento: date("dataPagamento"),
   
-  status: mysqlEnum("status", ["pendente", "pago", "atrasado", "cancelado"]).default("pendente").notNull(),
+  status: statusEnum6.default("pendente").notNull(),
   
   observacoes: text("observacoes"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("inst_tenant_idx").on(table.tenantId),
   transIdx: index("inst_trans_idx").on(table.transactionId),
@@ -907,15 +942,15 @@ export type InsertInstallment = typeof installments.$inferInsert;
 /**
  * Bank reconciliation table - Bank statement reconciliation
  */
-export const bankReconciliations = mysqlTable("bankReconciliations", {
-  id: int("id").autoincrement().primaryKey(),
+export const bankReconciliations = pgTable("bankReconciliations", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   
   // Dados do extrato bancário
   dataMovimento: date("dataMovimento").notNull(),
   descricao: text("descricao").notNull(),
   valor: decimal("valor", { precision: 12, scale: 2 }).notNull(),
-  tipo: mysqlEnum("tipo", ["credito", "debito"]).notNull(),
+  tipo: tipoEnum4.notNull(),
   
   // Conciliação
   conciliado: boolean("conciliado").default(false).notNull(),
@@ -931,7 +966,7 @@ export const bankReconciliations = mysqlTable("bankReconciliations", {
   observacoes: text("observacoes"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("bankrec_tenant_idx").on(table.tenantId),
   conciliadoIdx: index("bankrec_conciliado_idx").on(table.conciliado),
@@ -944,8 +979,8 @@ export type InsertBankReconciliation = typeof bankReconciliations.$inferInsert;
 /**
  * Electronic invoices table - NFe (Nota Fiscal Eletrônica)
  */
-export const electronicInvoices = mysqlTable("electronicInvoices", {
-  id: int("id").autoincrement().primaryKey(),
+export const electronicInvoices = pgTable("electronicInvoices", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   
   // Dados da NFe
@@ -968,7 +1003,7 @@ export const electronicInvoices = mysqlTable("electronicInvoices", {
   valorLiquido: decimal("valorLiquido", { precision: 12, scale: 2 }).notNull(),
   
   // Status
-  status: mysqlEnum("status", ["rascunho", "emitida", "autorizada", "cancelada", "denegada"]).default("rascunho").notNull(),
+  status: statusEnum7.default("rascunho").notNull(),
   
   // Arquivos
   xmlUrl: text("xmlUrl"),
@@ -989,7 +1024,7 @@ export const electronicInvoices = mysqlTable("electronicInvoices", {
   observacoes: text("observacoes"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("nfe_tenant_idx").on(table.tenantId),
   numeroIdx: index("nfe_numero_idx").on(table.numero),
@@ -1004,8 +1039,8 @@ export type InsertElectronicInvoice = typeof electronicInvoices.$inferInsert;
 /**
  * Patient vaccination history - Histórico de vacinações na área do paciente
  */
-export const patientVaccinationHistory = mysqlTable("patientVaccinationHistory", {
-  id: int("id").autoincrement().primaryKey(),
+export const patientVaccinationHistory = pgTable("patientVaccinationHistory", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   
   // Referências
@@ -1037,7 +1072,7 @@ export const patientVaccinationHistory = mysqlTable("patientVaccinationHistory",
   observacoes: text("observacoes"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("pvh_tenant_idx").on(table.tenantId),
   pacienteIdx: index("pvh_paciente_idx").on(table.pacienteId),
@@ -1057,8 +1092,8 @@ export type InsertPatientVaccinationHistory = typeof patientVaccinationHistory.$
 /**
  * POPs - Procedimentos Operacionais Padrão
  */
-export const pops = mysqlTable("pops", {
-  id: int("id").autoincrement().primaryKey(),
+export const pops = pgTable("pops", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   
   // Identificação do POP
@@ -1076,13 +1111,13 @@ export const pops = mysqlTable("pops", {
   dataElaboracao: date("dataElaboracao").notNull(),
   dataRevisao: date("dataRevisao"),
   proximaRevisao: date("proximaRevisao"),
-  status: mysqlEnum("status", ["ativo", "revisao", "obsoleto"]).default("ativo").notNull(),
+  status: statusEnum8.default("ativo").notNull(),
   
   // Documentos
   arquivoUrl: text("arquivoUrl"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("pops_tenant_idx").on(table.tenantId),
   codigoIdx: index("pops_codigo_idx").on(table.codigo),
@@ -1095,12 +1130,12 @@ export type InsertPop = typeof pops.$inferInsert;
 /**
  * Documentação Regulatória
  */
-export const regulatoryDocuments = mysqlTable("regulatoryDocuments", {
-  id: int("id").autoincrement().primaryKey(),
+export const regulatoryDocuments = pgTable("regulatoryDocuments", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   
   // Identificação
-  tipo: mysqlEnum("tipo", ["alvara", "licenca", "certificado", "laudo", "protocolo", "outro"]).notNull(),
+  tipo: tipoEnum5.notNull(),
   numero: varchar("numero", { length: 100 }).notNull(),
   orgaoEmissor: varchar("orgaoEmissor", { length: 255 }).notNull(),
   
@@ -1113,7 +1148,7 @@ export const regulatoryDocuments = mysqlTable("regulatoryDocuments", {
   dataValidade: date("dataValidade"),
   
   // Status
-  status: mysqlEnum("status", ["valido", "vencido", "em_renovacao", "suspenso"]).default("valido").notNull(),
+  status: statusEnum9.default("valido").notNull(),
   
   // Documentos
   arquivoUrl: text("arquivoUrl"),
@@ -1122,7 +1157,7 @@ export const regulatoryDocuments = mysqlTable("regulatoryDocuments", {
   diasAntesAlerta: int("diasAntesAlerta").default(30),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("regdoc_tenant_idx").on(table.tenantId),
   tipoIdx: index("regdoc_tipo_idx").on(table.tipo),
@@ -1136,12 +1171,12 @@ export type InsertRegulatoryDocument = typeof regulatoryDocuments.$inferInsert;
 /**
  * Checklists de Auditoria
  */
-export const auditChecklists = mysqlTable("auditChecklists", {
-  id: int("id").autoincrement().primaryKey(),
+export const auditChecklists = pgTable("auditChecklists", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   
   // Identificação da Auditoria
-  tipo: mysqlEnum("tipo", ["vigilancia_sanitaria", "acreditacao", "interna", "fornecedor", "outro"]).notNull(),
+  tipo: tipoEnum6.notNull(),
   titulo: varchar("titulo", { length: 255 }).notNull(),
   descricao: text("descricao"),
   
@@ -1153,7 +1188,7 @@ export const auditChecklists = mysqlTable("auditChecklists", {
   auditor: varchar("auditor", { length: 255 }),
   
   // Resultado
-  status: mysqlEnum("status", ["pendente", "em_andamento", "concluida", "aprovada", "reprovada"]).default("pendente").notNull(),
+  status: statusEnum10.default("pendente").notNull(),
   pontuacao: int("pontuacao"),
   pontuacaoMaxima: int("pontuacaoMaxima"),
   
@@ -1166,7 +1201,7 @@ export const auditChecklists = mysqlTable("auditChecklists", {
   relatorioUrl: text("relatorioUrl"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("audit_tenant_idx").on(table.tenantId),
   tipoIdx: index("audit_tipo_idx").on(table.tipo),
@@ -1180,8 +1215,8 @@ export type InsertAuditChecklist = typeof auditChecklists.$inferInsert;
 /**
  * Itens de Checklist de Auditoria
  */
-export const auditChecklistItems = mysqlTable("auditChecklistItems", {
-  id: int("id").autoincrement().primaryKey(),
+export const auditChecklistItems = pgTable("auditChecklistItems", {
+  id: serial("id").primaryKey(),
   checklistId: int("checklistId").notNull(),
   
   // Item
@@ -1202,7 +1237,7 @@ export const auditChecklistItems = mysqlTable("auditChecklistItems", {
   peso: int("peso").default(1),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   checklistIdx: index("audititem_checklist_idx").on(table.checklistId),
 }));
@@ -1214,12 +1249,12 @@ export type InsertAuditChecklistItem = typeof auditChecklistItems.$inferInsert;
  * Registro de Ocorrências / Contatos
  * Ligado aos pacientes via Área do Paciente - Reação pós Vacinal, Efeito Adverso
  */
-export const occurrences = mysqlTable("occurrences", {
-  id: int("id").autoincrement().primaryKey(),
+export const occurrences = pgTable("occurrences", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   
   // Tipo de Ocorrência
-  tipo: mysqlEnum("tipo", ["reacao_pos_vacinal", "efeito_adverso", "reclamacao", "sugestao", "elogio", "outro"]).notNull(),
+  tipo: tipoEnum7.notNull(),
   
   // Relacionamento com Paciente e Aplicação
   pacienteId: int("pacienteId"),
@@ -1233,14 +1268,14 @@ export const occurrences = mysqlTable("occurrences", {
   // Descrição da Ocorrência
   titulo: varchar("titulo", { length: 255 }).notNull(),
   descricao: text("descricao").notNull(),
-  gravidade: mysqlEnum("gravidade", ["baixa", "media", "alta", "critica"]).default("media"),
+  gravidade: gravidadeEnum.default("media"),
   
   // Datas
   dataOcorrencia: timestamp("dataOcorrencia").notNull(),
   dataRegistro: timestamp("dataRegistro").defaultNow().notNull(),
   
   // Tratamento
-  status: mysqlEnum("status", ["aberta", "em_analise", "em_tratamento", "resolvida", "fechada"]).default("aberta").notNull(),
+  status: statusEnum11.default("aberta").notNull(),
   responsavel: varchar("responsavel", { length: 255 }),
   acaoTomada: text("acaoTomada"),
   dataResolucao: timestamp("dataResolucao"),
@@ -1253,7 +1288,7 @@ export const occurrences = mysqlTable("occurrences", {
   anexoUrl: text("anexoUrl"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("occ_tenant_idx").on(table.tenantId),
   pacienteIdx: index("occ_paciente_idx").on(table.pacienteId),
@@ -1269,12 +1304,12 @@ export type InsertOccurrence = typeof occurrences.$inferInsert;
  * Registro de Temperaturas (Geladeiras e Caixas de Transporte)
  * Nota: Já existe temperatureLogs, vamos estender para incluir caixas de transporte
  */
-export const temperatureMonitoring = mysqlTable("temperatureMonitoring", {
-  id: int("id").autoincrement().primaryKey(),
+export const temperatureMonitoring = pgTable("temperatureMonitoring", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   
   // Equipamento
-  tipoEquipamento: mysqlEnum("tipoEquipamento", ["geladeira", "caixa_transporte", "freezer", "camara_fria"]).notNull(),
+  tipoEquipamento: tipoEquipamentoEnum1.notNull(),
   equipamentoId: int("equipamentoId"), // refrigeratorId se for geladeira
   nomeEquipamento: varchar("nomeEquipamento", { length: 255 }).notNull(),
   
@@ -1313,17 +1348,17 @@ export type InsertTemperatureMonitoring = typeof temperatureMonitoring.$inferIns
  * Registro de Manutenções (Corretivas e Preventivas)
  * Nota: Já existe refrigeratorMaintenances, vamos criar uma tabela mais genérica
  */
-export const maintenanceRecords = mysqlTable("maintenanceRecords", {
-  id: int("id").autoincrement().primaryKey(),
+export const maintenanceRecords = pgTable("maintenanceRecords", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   
   // Equipamento
-  tipoEquipamento: mysqlEnum("tipoEquipamento", ["geladeira", "freezer", "ar_condicionado", "gerador", "computador", "impressora", "outro"]).notNull(),
+  tipoEquipamento: tipoEquipamentoEnum.notNull(),
   equipamentoId: int("equipamentoId"),
   nomeEquipamento: varchar("nomeEquipamento", { length: 255 }).notNull(),
   
   // Tipo de Manutenção
-  tipoManutencao: mysqlEnum("tipoManutencao", ["preventiva", "corretiva", "preditiva"]).notNull(),
+  tipoManutencao: tipoManutencaoEnum.notNull(),
   
   // Descrição
   titulo: varchar("titulo", { length: 255 }).notNull(),
@@ -1342,7 +1377,7 @@ export const maintenanceRecords = mysqlTable("maintenanceRecords", {
   custo: decimal("custo", { precision: 10, scale: 2 }),
   
   // Status
-  status: mysqlEnum("status", ["agendada", "em_andamento", "concluida", "cancelada"]).default("agendada").notNull(),
+  status: statusEnum12.default("agendada").notNull(),
   
   // Observações
   observacoes: text("observacoes"),
@@ -1353,7 +1388,7 @@ export const maintenanceRecords = mysqlTable("maintenanceRecords", {
   relatorioUrl: text("relatorioUrl"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("maint_tenant_idx").on(table.tenantId),
   equipamentoIdx: index("maint_equipamento_idx").on(table.equipamentoId),
@@ -1368,13 +1403,13 @@ export type InsertMaintenanceRecord = typeof maintenanceRecords.$inferInsert;
 /**
  * Registro de Treinamentos do RH
  */
-export const trainingRecords = mysqlTable("trainingRecords", {
-  id: int("id").autoincrement().primaryKey(),
+export const trainingRecords = pgTable("trainingRecords", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   
   // Identificação do Treinamento
   titulo: varchar("titulo", { length: 255 }).notNull(),
-  tipo: mysqlEnum("tipo", ["admissao", "reciclagem", "capacitacao", "workshop", "palestra", "curso", "outro"]).notNull(),
+  tipo: tipoEnum8.notNull(),
   categoria: varchar("categoria", { length: 100 }),
   
   // Descrição
@@ -1391,7 +1426,7 @@ export const trainingRecords = mysqlTable("trainingRecords", {
   cargaHoraria: int("cargaHoraria"),
   
   // Status
-  status: mysqlEnum("status", ["planejado", "realizado", "cancelado"]).default("planejado").notNull(),
+  status: statusEnum13.default("planejado").notNull(),
   
   // Certificação
   certificado: boolean("certificado").default(false),
@@ -1403,7 +1438,7 @@ export const trainingRecords = mysqlTable("trainingRecords", {
   certificadoUrl: text("certificadoUrl"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("train_tenant_idx").on(table.tenantId),
   tipoIdx: index("train_tipo_idx").on(table.tipo),
@@ -1417,8 +1452,8 @@ export type InsertTrainingRecord = typeof trainingRecords.$inferInsert;
 /**
  * Participantes de Treinamento
  */
-export const trainingParticipants = mysqlTable("trainingParticipants", {
-  id: int("id").autoincrement().primaryKey(),
+export const trainingParticipants = pgTable("trainingParticipants", {
+  id: serial("id").primaryKey(),
   trainingId: int("trainingId").notNull(),
   employeeId: int("employeeId").notNull(),
   
@@ -1435,7 +1470,7 @@ export const trainingParticipants = mysqlTable("trainingParticipants", {
   observacoes: text("observacoes"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   trainingIdx: index("trainpart_training_idx").on(table.trainingId),
   employeeIdx: index("trainpart_employee_idx").on(table.employeeId),
@@ -1452,8 +1487,8 @@ export type InsertTrainingParticipant = typeof trainingParticipants.$inferInsert
 /**
  * Colaboradores (RH)
  */
-export const hrEmployees = mysqlTable("hrEmployees", {
-  id: int("id").autoincrement().primaryKey(),
+export const hrEmployees = pgTable("hrEmployees", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   userId: int("userId"), // Link com tabela users se tiver acesso ao sistema
   
@@ -1462,8 +1497,8 @@ export const hrEmployees = mysqlTable("hrEmployees", {
   cpf: varchar("cpf", { length: 14 }).notNull(),
   rg: varchar("rg", { length: 20 }),
   dataNascimento: date("dataNascimento"),
-  sexo: mysqlEnum("sexo", ["masculino", "feminino", "outro"]),
-  estadoCivil: mysqlEnum("estadoCivil", ["solteiro", "casado", "divorciado", "viuvo", "outro"]),
+  sexo: sexoEnum,
+  estadoCivil: estadoCivilEnum,
   
   // Contato
   email: varchar("email", { length: 255 }),
@@ -1484,12 +1519,12 @@ export const hrEmployees = mysqlTable("hrEmployees", {
   setor: varchar("setor", { length: 100 }),
   dataAdmissao: date("dataAdmissao"),
   dataDemissao: date("dataDemissao"),
-  tipoContrato: mysqlEnum("tipoContrato", ["clt", "pj", "estagio", "temporario", "autonomo"]),
+  tipoContrato: tipoContratoEnum,
   salario: decimal("salario", { precision: 10, scale: 2 }),
   cargaHoraria: int("cargaHoraria").default(40), // horas semanais
   
   // Perfil de Acesso
-  perfil: mysqlEnum("perfil", ["gestor", "aplicador", "global", "suporte", "administrativo", "financeiro"]),
+  perfil: perfilEnum,
   senha: varchar("senha", { length: 255 }), // Hash da senha para login na ADC
   
   // Documentos Profissionais
@@ -1504,7 +1539,7 @@ export const hrEmployees = mysqlTable("hrEmployees", {
   orgaoRegistro: varchar("orgaoRegistro", { length: 50 }), // COREN, CRM, etc
   
   // Status
-  status: mysqlEnum("status", ["ativo", "ferias", "afastado", "demitido"]).default("ativo"),
+  status: statusEnum14.default("ativo"),
   
   // Observações
   observacoes: text("observacoes"),
@@ -1513,7 +1548,7 @@ export const hrEmployees = mysqlTable("hrEmployees", {
   fotoUrl: text("fotoUrl"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("emp_tenant_idx").on(table.tenantId),
   cpfIdx: index("emp_cpf_idx").on(table.cpf),
@@ -1527,10 +1562,10 @@ export type InsertHREmployee = typeof hrEmployees.$inferInsert;
 /**
  * Permissões por Perfil
  */
-export const profilePermissions = mysqlTable("profilePermissions", {
-  id: int("id").autoincrement().primaryKey(),
+export const profilePermissions = pgTable("profilePermissions", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
-  perfil: mysqlEnum("perfil", ["gestor", "aplicador", "global", "suporte", "administrativo", "financeiro"]).notNull(),
+  perfil: perfilEnum.notNull(),
   
   // Módulos
   moduloPacientes: boolean("moduloPacientes").default(false),
@@ -1548,7 +1583,7 @@ export const profilePermissions = mysqlTable("profilePermissions", {
   podeExportar: boolean("podeExportar").default(false),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantPerfilIdx: index("perm_tenant_perfil_idx").on(table.tenantId, table.perfil),
 }));
@@ -1559,8 +1594,8 @@ export type InsertProfilePermission = typeof profilePermissions.$inferInsert;
 /**
  * Folha de Pagamento
  */
-export const payrolls = mysqlTable("payrolls", {
-  id: int("id").autoincrement().primaryKey(),
+export const payrolls = pgTable("payrolls", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   employeeId: int("employeeId").notNull(),
   
@@ -1591,7 +1626,7 @@ export const payrolls = mysqlTable("payrolls", {
   salarioLiquido: decimal("salarioLiquido", { precision: 10, scale: 2 }).notNull(),
   
   // Status
-  status: mysqlEnum("status", ["rascunho", "calculado", "aprovado", "pago"]).default("rascunho"),
+  status: statusEnum15.default("rascunho"),
   dataPagamento: date("dataPagamento"),
   
   // Holerite
@@ -1601,7 +1636,7 @@ export const payrolls = mysqlTable("payrolls", {
   observacoes: text("observacoes"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("pay_tenant_idx").on(table.tenantId),
   employeeIdx: index("pay_employee_idx").on(table.employeeId),
@@ -1615,13 +1650,13 @@ export type InsertPayroll = typeof payrolls.$inferInsert;
 /**
  * Benefícios
  */
-export const employeeBenefits = mysqlTable("employeeBenefits", {
-  id: int("id").autoincrement().primaryKey(),
+export const employeeBenefits = pgTable("employeeBenefits", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   employeeId: int("employeeId").notNull(),
   
   // Tipo de Benefício
-  tipo: mysqlEnum("tipo", ["vale_transporte", "vale_refeicao", "vale_alimentacao", "plano_saude", "plano_odontologico", "seguro_vida", "outro"]).notNull(),
+  tipo: tipoEnum9.notNull(),
   nome: varchar("nome", { length: 255 }).notNull(),
   descricao: text("descricao"),
   
@@ -1634,14 +1669,14 @@ export const employeeBenefits = mysqlTable("employeeBenefits", {
   dataFim: date("dataFim"),
   
   // Status
-  status: mysqlEnum("status", ["ativo", "inativo", "suspenso"]).default("ativo"),
+  status: statusEnum1.default("ativo"),
   
   // Fornecedor
   fornecedor: varchar("fornecedor", { length: 255 }),
   numeroCartao: varchar("numeroCartao", { length: 50 }),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("ben_tenant_idx").on(table.tenantId),
   employeeIdx: index("ben_employee_idx").on(table.employeeId),
@@ -1655,8 +1690,8 @@ export type InsertEmployeeBenefit = typeof employeeBenefits.$inferInsert;
 /**
  * Ponto Eletrônico
  */
-export const timeClocks = mysqlTable("timeClocks", {
-  id: int("id").autoincrement().primaryKey(),
+export const timeClocks = pgTable("timeClocks", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   employeeId: int("employeeId").notNull(),
   
@@ -1678,7 +1713,7 @@ export const timeClocks = mysqlTable("timeClocks", {
   horasExtras: decimal("horasExtras", { precision: 5, scale: 2 }),
   
   // Status
-  status: mysqlEnum("status", ["normal", "falta", "atestado", "ferias", "folga"]).default("normal"),
+  status: statusEnum16.default("normal"),
   
   // Justificativa
   justificativa: text("justificativa"),
@@ -1690,7 +1725,7 @@ export const timeClocks = mysqlTable("timeClocks", {
   dataAprovacao: timestamp("dataAprovacao"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("time_tenant_idx").on(table.tenantId),
   employeeIdx: index("time_employee_idx").on(table.employeeId),
@@ -1704,8 +1739,8 @@ export type InsertTimeClock = typeof timeClocks.$inferInsert;
 /**
  * Registro de KM
  */
-export const mileageRecords = mysqlTable("mileageRecords", {
-  id: int("id").autoincrement().primaryKey(),
+export const mileageRecords = pgTable("mileageRecords", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   employeeId: int("employeeId").notNull(),
   
@@ -1730,7 +1765,7 @@ export const mileageRecords = mysqlTable("mileageRecords", {
   valorTotal: decimal("valorTotal", { precision: 10, scale: 2 }),
   
   // Status
-  status: mysqlEnum("status", ["pendente", "aprovado", "reprovado", "pago"]).default("pendente"),
+  status: statusEnum17.default("pendente"),
   aprovadoPor: int("aprovadoPor"),
   dataAprovacao: timestamp("dataAprovacao"),
   
@@ -1738,7 +1773,7 @@ export const mileageRecords = mysqlTable("mileageRecords", {
   comprovanteUrl: text("comprovanteUrl"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("mile_tenant_idx").on(table.tenantId),
   employeeIdx: index("mile_employee_idx").on(table.employeeId),
@@ -1752,8 +1787,8 @@ export type InsertMileageRecord = typeof mileageRecords.$inferInsert;
 /**
  * Solicitações de Horas Extras
  */
-export const overtimeRequests = mysqlTable("overtimeRequests", {
-  id: int("id").autoincrement().primaryKey(),
+export const overtimeRequests = pgTable("overtimeRequests", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   employeeId: int("employeeId").notNull(),
   
@@ -1768,16 +1803,16 @@ export const overtimeRequests = mysqlTable("overtimeRequests", {
   atividades: text("atividades"),
   
   // Tipo
-  tipo: mysqlEnum("tipo", ["normal", "noturna", "feriado", "domingo"]).default("normal"),
+  tipo: tipoEnum10.default("normal"),
   
   // Status
-  status: mysqlEnum("status", ["pendente", "aprovada", "reprovada"]).default("pendente"),
+  status: statusEnum18.default("pendente"),
   aprovadoPor: int("aprovadoPor"),
   dataAprovacao: timestamp("dataAprovacao"),
   motivoReprovacao: text("motivoReprovacao"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("over_tenant_idx").on(table.tenantId),
   employeeIdx: index("over_employee_idx").on(table.employeeId),
@@ -1791,8 +1826,8 @@ export type InsertOvertimeRequest = typeof overtimeRequests.$inferInsert;
 /**
  * Registro de Ausências
  */
-export const absenceRecords = mysqlTable("absenceRecords", {
-  id: int("id").autoincrement().primaryKey(),
+export const absenceRecords = pgTable("absenceRecords", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   employeeId: int("employeeId").notNull(),
   
@@ -1802,19 +1837,19 @@ export const absenceRecords = mysqlTable("absenceRecords", {
   totalDias: int("totalDias").notNull(),
   
   // Tipo
-  tipo: mysqlEnum("tipo", ["ferias", "atestado", "licenca_maternidade", "licenca_paternidade", "falta_justificada", "falta_injustificada", "outro"]).notNull(),
+  tipo: tipoEnum11.notNull(),
   
   // Justificativa
   motivo: text("motivo"),
   documentoUrl: text("documentoUrl"),
   
   // Status
-  status: mysqlEnum("status", ["pendente", "aprovada", "reprovada"]).default("pendente"),
+  status: statusEnum18.default("pendente"),
   aprovadoPor: int("aprovadoPor"),
   dataAprovacao: timestamp("dataAprovacao"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("abs_tenant_idx").on(table.tenantId),
   employeeIdx: index("abs_employee_idx").on(table.employeeId),
@@ -1828,8 +1863,8 @@ export type InsertAbsenceRecord = typeof absenceRecords.$inferInsert;
 /**
  * CAT - Comunicado de Acidente de Trabalho
  */
-export const workAccidents = mysqlTable("workAccidents", {
-  id: int("id").autoincrement().primaryKey(),
+export const workAccidents = pgTable("workAccidents", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   employeeId: int("employeeId").notNull(),
   
@@ -1862,13 +1897,13 @@ export const workAccidents = mysqlTable("workAccidents", {
   catUrl: text("catUrl"),
   
   // Status
-  status: mysqlEnum("status", ["registrado", "em_analise", "encerrado"]).default("registrado"),
+  status: statusEnum19.default("registrado"),
   
   // Observações
   observacoes: text("observacoes"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("cat_tenant_idx").on(table.tenantId),
   employeeIdx: index("cat_employee_idx").on(table.employeeId),
@@ -1885,8 +1920,8 @@ export type InsertWorkAccident = typeof workAccidents.$inferInsert;
 // ============================================
 
 // Estabelecimentos e CNES
-export const healthEstablishments = mysqlTable("health_establishments", {
-  id: int("id").autoincrement().primaryKey(),
+export const healthEstablishments = pgTable("health_establishments", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   
   // Identificação
@@ -1915,7 +1950,7 @@ export const healthEstablishments = mysqlTable("health_establishments", {
   ativo: boolean("ativo").default(true),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("health_est_tenant_idx").on(table.tenantId),
   cnesIdx: index("health_est_cnes_idx").on(table.cnes),
@@ -1925,13 +1960,13 @@ export type HealthEstablishment = typeof healthEstablishments.$inferSelect;
 export type InsertHealthEstablishment = typeof healthEstablishments.$inferInsert;
 
 // Credenciais de Integração RNDS
-export const rndsCredentials = mysqlTable("rnds_credentials", {
-  id: int("id").autoincrement().primaryKey(),
+export const rndsCredentials = pgTable("rnds_credentials", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   establishmentId: int("establishmentId").notNull(),
   
   // Ambiente
-  ambiente: mysqlEnum("ambiente", ["homologacao", "producao"]).notNull(),
+  ambiente: ambienteEnum.notNull(),
   
   // Credenciais (criptografadas)
   clientId: text("clientId").notNull(),
@@ -1950,7 +1985,7 @@ export const rndsCredentials = mysqlTable("rnds_credentials", {
   observacoes: text("observacoes"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("rnds_cred_tenant_idx").on(table.tenantId),
   establishmentIdx: index("rnds_cred_est_idx").on(table.establishmentId),
@@ -1961,18 +1996,18 @@ export type RndsCredential = typeof rndsCredentials.$inferSelect;
 export type InsertRndsCredential = typeof rndsCredentials.$inferInsert;
 
 // Configurações Fiscais (NFS-e / NFe)
-export const fiscalConfigurations = mysqlTable("fiscal_configurations", {
-  id: int("id").autoincrement().primaryKey(),
+export const fiscalConfigurations = pgTable("fiscal_configurations", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   establishmentId: int("establishmentId").notNull(),
   
   // Tipo de Nota
-  tipoNota: mysqlEnum("tipoNota", ["nfse", "nfe", "nfce"]).notNull(),
+  tipoNota: tipoNotaEnum.notNull(),
   
   // Dados Fiscais
   inscricaoMunicipal: varchar("inscricaoMunicipal", { length: 50 }),
   inscricaoEstadual: varchar("inscricaoEstadual", { length: 50 }),
-  regimeTributario: mysqlEnum("regimeTributario", ["simples_nacional", "lucro_presumido", "lucro_real"]),
+  regimeTributario: regimeTributarioEnum,
   cnae: varchar("cnae", { length: 10 }),
   
   // Alíquotas
@@ -1986,7 +2021,7 @@ export const fiscalConfigurations = mysqlTable("fiscal_configurations", {
   validadeCertificado: date("validadeCertificado"),
   
   // Ambiente
-  ambiente: mysqlEnum("ambiente", ["homologacao", "producao"]).notNull(),
+  ambiente: ambienteEnum.notNull(),
   
   // Endpoints (se integração direta)
   endpointEmissao: varchar("endpointEmissao", { length: 500 }),
@@ -1999,7 +2034,7 @@ export const fiscalConfigurations = mysqlTable("fiscal_configurations", {
   observacoes: text("observacoes"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("fiscal_config_tenant_idx").on(table.tenantId),
   establishmentIdx: index("fiscal_config_est_idx").on(table.establishmentId),
@@ -2010,13 +2045,13 @@ export type FiscalConfiguration = typeof fiscalConfigurations.$inferSelect;
 export type InsertFiscalConfiguration = typeof fiscalConfigurations.$inferInsert;
 
 // Fila de Envios (Outbox Pattern)
-export const integrationOutbox = mysqlTable("integration_outbox", {
-  id: int("id").autoincrement().primaryKey(),
+export const integrationOutbox = pgTable("integration_outbox", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   establishmentId: int("establishmentId").notNull(),
   
   // Tipo de Integração
-  tipoIntegracao: mysqlEnum("tipoIntegracao", ["rnds_ria", "nfse", "nfe", "nfce"]).notNull(),
+  tipoIntegracao: tipoIntegracaoEnum.notNull(),
   
   // Referência
   referenciaId: int("referenciaId").notNull(), // ID da aplicação ou transação
@@ -2026,7 +2061,7 @@ export const integrationOutbox = mysqlTable("integration_outbox", {
   payload: json("payload").notNull(), // Documento FHIR ou XML fiscal
   
   // Status
-  status: mysqlEnum("status", ["pendente", "enviando", "enviado", "aceito", "rejeitado", "erro"]).default("pendente"),
+  status: statusEnum20.default("pendente"),
   tentativas: int("tentativas").default(0),
   maxTentativas: int("maxTentativas").default(5),
   
@@ -2042,7 +2077,7 @@ export const integrationOutbox = mysqlTable("integration_outbox", {
   proximaTentativa: timestamp("proximaTentativa"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("outbox_tenant_idx").on(table.tenantId),
   statusIdx: index("outbox_status_idx").on(table.status),
@@ -2054,8 +2089,8 @@ export type IntegrationOutbox = typeof integrationOutbox.$inferSelect;
 export type InsertIntegrationOutbox = typeof integrationOutbox.$inferInsert;
 
 // Logs de Integração (Auditoria)
-export const integrationLogs = mysqlTable("integration_logs", {
-  id: int("id").autoincrement().primaryKey(),
+export const integrationLogs = pgTable("integration_logs", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   outboxId: int("outboxId").notNull(),
   
@@ -2087,14 +2122,14 @@ export type IntegrationLog = typeof integrationLogs.$inferSelect;
 export type InsertIntegrationLog = typeof integrationLogs.$inferInsert;
 
 // Estatísticas de Integração
-export const integrationStats = mysqlTable("integration_stats", {
-  id: int("id").autoincrement().primaryKey(),
+export const integrationStats = pgTable("integration_stats", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   establishmentId: int("establishmentId").notNull(),
   
   // Período
   data: date("data").notNull(),
-  tipoIntegracao: mysqlEnum("tipoIntegracao", ["rnds_ria", "nfse", "nfe", "nfce"]).notNull(),
+  tipoIntegracao: tipoIntegracaoEnum.notNull(),
   
   // Contadores
   totalEnviados: int("totalEnviados").default(0),
@@ -2114,7 +2149,7 @@ export const integrationStats = mysqlTable("integration_stats", {
   icSuperiorPercent: decimal("icSuperiorPercent", { precision: 5, scale: 2 }),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("stats_tenant_idx").on(table.tenantId),
   dataIdx: index("stats_data_idx").on(table.data),
@@ -2130,8 +2165,8 @@ export type InsertIntegrationStat = typeof integrationStats.$inferInsert;
 /**
  * Appointments table - Scheduling for vaccinations
  */
-export const appointments = mysqlTable("appointments", {
-  id: int("id").autoincrement().primaryKey(),
+export const appointments = pgTable("appointments", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   
   // Paciente
@@ -2141,7 +2176,7 @@ export const appointments = mysqlTable("appointments", {
   
   // Agendamento
   dataHora: timestamp("dataHora").notNull(),
-  tipo: mysqlEnum("tipo", ["unidade", "domiciliar"]).notNull(),
+  tipo: tipoEnum.notNull(),
   
   // Local
   unitId: int("unitId"),
@@ -2164,7 +2199,7 @@ export const appointments = mysqlTable("appointments", {
   valorFinal: decimal("valorFinal", { precision: 12, scale: 2 }),
   
   // Status
-  status: mysqlEnum("status", ["pendente", "confirmado", "realizado", "cancelado"]).default("pendente").notNull(),
+  status: statusEnum21.default("pendente").notNull(),
   motivoCancelamento: text("motivoCancelamento"),
   
   // Pagamento antecipado
@@ -2185,7 +2220,7 @@ export const appointments = mysqlTable("appointments", {
   observacoes: text("observacoes"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("appt_tenant_idx").on(table.tenantId),
   patientIdx: index("appt_patient_idx").on(table.patientId),
@@ -2201,8 +2236,8 @@ export type InsertAppointment = typeof appointments.$inferInsert;
 /**
  * Budgets table - Vaccine budget quotes
  */
-export const budgets = mysqlTable("budgets", {
-  id: int("id").autoincrement().primaryKey(),
+export const budgets = pgTable("budgets", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   
   // Número do orçamento (formato: ORÇ-YYYYMMDD-XXXX)
@@ -2229,14 +2264,14 @@ export const budgets = mysqlTable("budgets", {
   dataValidade: timestamp("dataValidade").notNull(),
   
   // Status e conversão
-  status: mysqlEnum("status", ["pendente", "aprovado", "recusado", "convertido", "expirado", "cancelado"]).default("pendente").notNull(),
+  status: statusEnum22.default("pendente").notNull(),
   applicationId: int("applicationId"), // ID da aplicação quando convertido
   dataConversao: timestamp("dataConversao"),
   
   observacoes: text("observacoes"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("budget_tenant_idx").on(table.tenantId),
   numeroIdx: index("budget_numero_idx").on(table.numero),
@@ -2254,8 +2289,8 @@ export type InsertBudget = typeof budgets.$inferInsert;
 /**
  * Price Tables table - Named price tables (Particular, 5% Desconto, etc.)
  */
-export const priceTables = mysqlTable("price_tables", {
-  id: int("id").autoincrement().primaryKey(),
+export const priceTables = pgTable("price_tables", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   
   nome: varchar("nome", { length: 255 }).notNull(), // Ex: "Particular", "5% de Desconto", "Familiares de Colaboradores"
@@ -2265,7 +2300,7 @@ export const priceTables = mysqlTable("price_tables", {
   padrao: boolean("padrao").default(false).notNull(), // Tabela padrão para novos orçamentos
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("ptable_tenant_idx").on(table.tenantId),
   ativoIdx: index("ptable_ativo_idx").on(table.ativo),
@@ -2277,8 +2312,8 @@ export type InsertPriceTable = typeof priceTables.$inferInsert;
 /**
  * Vaccine Prices table - Selling prices for vaccines
  */
-export const vaccinePrices = mysqlTable("vaccine_prices", {
-  id: int("id").autoincrement().primaryKey(),
+export const vaccinePrices = pgTable("vaccine_prices", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   priceTableId: int("priceTableId").notNull(), // Referência à tabela de preços
   vaccineId: int("vaccineId").notNull(),
@@ -2293,7 +2328,7 @@ export const vaccinePrices = mysqlTable("vaccine_prices", {
   ativo: boolean("ativo").default(true).notNull(),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("vprice_tenant_idx").on(table.tenantId),
   priceTableIdx: index("vprice_pricetable_idx").on(table.priceTableId),
@@ -2307,15 +2342,15 @@ export type InsertVaccinePrice = typeof vaccinePrices.$inferInsert;
 /**
  * Price Campaigns table - Discount campaigns
  */
-export const priceCampaigns = mysqlTable("price_campaigns", {
-  id: int("id").autoincrement().primaryKey(),
+export const priceCampaigns = pgTable("price_campaigns", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   
   nome: varchar("nome", { length: 255 }).notNull(),
   descricao: text("descricao"),
   
   // Tipo de desconto
-  tipoDesconto: mysqlEnum("tipoDesconto", ["percentual", "valor_fixo"]).notNull(),
+  tipoDesconto: tipoDescontoEnum.notNull(),
   valorDesconto: int("valorDesconto").notNull(), // percentual (ex: 10 = 10%) ou valor em centavos
   
   // Vacinas aplicáveis (null = todas)
@@ -2328,7 +2363,7 @@ export const priceCampaigns = mysqlTable("price_campaigns", {
   ativo: boolean("ativo").default(true).notNull(),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("campaign_tenant_idx").on(table.tenantId),
   ativoIdx: index("campaign_ativo_idx").on(table.ativo),
@@ -2341,15 +2376,15 @@ export type InsertPriceCampaign = typeof priceCampaigns.$inferInsert;
 /**
  * Bank Accounts table - Bank accounts for reconciliation
  */
-export const bankAccounts = mysqlTable("bank_accounts", {
-  id: int("id").autoincrement().primaryKey(),
+export const bankAccounts = pgTable("bank_accounts", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   
   // Dados da conta
   banco: varchar("banco", { length: 100 }).notNull(), // Nome do banco
   agencia: varchar("agencia", { length: 20 }).notNull(),
   conta: varchar("conta", { length: 20 }).notNull(),
-  tipoConta: mysqlEnum("tipoConta", ["corrente", "poupanca", "pagamento"]).notNull(),
+  tipoConta: tipoContaEnum.notNull(),
   
   // Identificação
   apelido: varchar("apelido", { length: 100 }).notNull(), // Ex: "Conta Principal", "Conta Reserva"
@@ -2363,7 +2398,7 @@ export const bankAccounts = mysqlTable("bank_accounts", {
   ativa: boolean("ativa").default(true).notNull(),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("bank_account_tenant_idx").on(table.tenantId),
   ativaIdx: index("bank_account_ativa_idx").on(table.ativa),
@@ -2376,8 +2411,8 @@ export type InsertBankAccount = typeof bankAccounts.$inferInsert;
 /**
  * Home care addresses table - Addresses for home care service
  */
-export const homeCareAddresses = mysqlTable("home_care_addresses", {
-  id: int("id").autoincrement().primaryKey(),
+export const homeCareAddresses = pgTable("home_care_addresses", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   patientId: int("patientId").notNull(),
   
@@ -2395,7 +2430,7 @@ export const homeCareAddresses = mysqlTable("home_care_addresses", {
   longitude: decimal("longitude", { precision: 11, scale: 8 }),
   
   // Região (para cálculo de taxa)
-  regiao: mysqlEnum("regiao", ["grande_campinas", "regiao_entorno", "outra"]).default("grande_campinas").notNull(),
+  regiao: regiaoEnum.default("grande_campinas").notNull(),
   
   // Referências
   pontoReferencia: text("pontoReferencia"),
@@ -2404,7 +2439,7 @@ export const homeCareAddresses = mysqlTable("home_care_addresses", {
   ativo: boolean("ativo").default(true).notNull(),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("hca_tenant_idx").on(table.tenantId),
   patientIdx: index("hca_patient_idx").on(table.patientId),
@@ -2418,8 +2453,8 @@ export type InsertHomeCareAddress = typeof homeCareAddresses.$inferInsert;
 /**
  * Appointment routes table - Optimized routes for home care
  */
-export const appointmentRoutes = mysqlTable("appointment_routes", {
-  id: int("id").autoincrement().primaryKey(),
+export const appointmentRoutes = pgTable("appointment_routes", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   
   // Data da rota
@@ -2439,13 +2474,13 @@ export const appointmentRoutes = mysqlTable("appointment_routes", {
   rotaOtimizada: json("rotaOtimizada"),
   
   // Status
-  status: mysqlEnum("status", ["planejada", "em_andamento", "concluida", "cancelada"]).default("planejada").notNull(),
+  status: statusEnum23.default("planejada").notNull(),
   
   // Observações
   observacoes: text("observacoes"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("route_tenant_idx").on(table.tenantId),
   dataIdx: index("route_data_idx").on(table.dataRota),
@@ -2459,8 +2494,8 @@ export type InsertAppointmentRoute = typeof appointmentRoutes.$inferInsert;
 /**
  * Vaccine reservations table - Vaccines reserved for appointments
  */
-export const vaccineReservations = mysqlTable("vaccine_reservations", {
-  id: int("id").autoincrement().primaryKey(),
+export const vaccineReservations = pgTable("vaccine_reservations", {
+  id: serial("id").primaryKey(),
   tenantId: int("tenantId").notNull(),
   
   // Agendamento
@@ -2477,7 +2512,7 @@ export const vaccineReservations = mysqlTable("vaccine_reservations", {
   refrigeratorId: int("refrigeratorId").notNull(),
   
   // Status
-  status: mysqlEnum("status", ["reservada", "aplicada", "cancelada", "expirada"]).default("reservada").notNull(),
+  status: statusEnum.default("reservada").notNull(),
   
   // Datas
   dataReserva: timestamp("dataReserva").defaultNow().notNull(),
@@ -2485,7 +2520,7 @@ export const vaccineReservations = mysqlTable("vaccine_reservations", {
   dataAplicacao: timestamp("dataAplicacao"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
   tenantIdx: index("vres_tenant_idx").on(table.tenantId),
   apptIdx: index("vres_appt_idx").on(table.appointmentId),
